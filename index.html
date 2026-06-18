@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>浦島太郎</title>
+
+<style>
+body{
+    font-family:sans-serif;
+    text-align:center;
+    background:#6dc3d0;
+    margin:0;
+    padding:60px 40px 40px 40px;
+    transition:1s;
+}
+
+#ryugujo{
+
+    position:fixed;
+
+    left:20px;
+
+    bottom:5vh;
+
+    width:200px;
+
+    height:auto;
+
+    z-index:0;
+
+    pointer-events:none;
+}
+
+#ground{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:10vh;
+    background:#b4945a;
+    z-index:-1;
+}
+
+h1{
+    color:#005577;
+}
+
+#story{
+    max-width:700px;
+    margin:auto;
+    line-height:1.8;
+}
+
+button{
+    font-size:18px;
+    padding:10px 20px;
+}
+
+.answerButton{
+    font-size:18px;
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+input{
+    font-size:20px;
+    padding:10px;
+    width:300px;
+    box-sizing:border-box;
+}
+
+.hidden{
+    display:none;
+}
+
+.old{
+    background:#c0c0c0;
+    color:white;
+}
+
+
+.hidden{
+    display:none;
+}
+
+#memoryPanel{
+
+    display:flex;
+
+    gap:10px;
+}
+
+
+.memoryButton{
+
+    margin:0;
+
+    padding:8px 15px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:white;
+
+    color:#003344;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,0.7);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:2000;
+}
+
+.modalContent{
+
+    background:white;
+
+    color:black;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    max-width:500px;
+}
+
+.hidden{
+    display:none;
+}
+
+#smoke-container{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:9999;
+}
+
+.smoke{
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.95) 0%,
+            rgba(255,255,255,0.7) 50%,
+            rgba(255,255,255,0) 100%
+        );
+
+    animation:puff 4s ease-out forwards;
+}
+
+
+@keyframes puff{
+
+    0%{
+        transform:translate(0,0) scale(0.2);
+        opacity:0;
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        transform:
+            translate(var(--dx), var(--dy))
+            scale(4);
+        opacity:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="ground"></div>
+
+<img
+    src="ryuuguujyou.png"
+    id="ryugujo"
+    alt="竜宮城">
+
+
+<!-- 記憶獲得ポップアップ -->
+<div id="memoryPopup" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2>記憶を思い出した</h2>
+
+        <p id="memoryText"></p>
+
+        <button onclick="closeMemoryPopup()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<!-- 記憶閲覧ポップアップ -->
+<div id="memoryViewer" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2 id="viewerTitle"></h2>
+
+        <p id="viewerText"></p>
+
+        <button onclick="closeMemoryViewer()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<h1>STEP1</h1>
+
+<div id="story">
+    昔々、浦島太郎は亀を助けました。<br>
+    お礼に竜宮城へ招かれ、楽しい時間を過ごしました。<br><br>
+
+    帰るとき、乙姫様から玉手箱を渡されました。<br>
+    「決して開けてはいけません」
+</div>
+
+<div id="smoke-container"></div>
+
+<button id="boxButton" onclick="openBox()">
+    開ける
+</button>
+
+
+<div id="after" class="hidden">
+
+    <h2>あなたは箱を開けてしまった！</h2>
+
+    <p>
+        答えを入力してください
+    </p>
+
+    <input id="answer">
+
+    <button class="answerButton" onclick="check()">
+        回答
+    </button>
+
+    <p id="result"></p>
+
+</div>
+
+
+<script>
+
+let nextPage = "";
+
+function openBox(){
+
+    createSmoke();
+
+    setTimeout(()=>{
+
+        document.body.classList.add("old");
+
+        document
+            .getElementById("story")
+            .style.display = "none";
+
+        document
+            .getElementById("boxButton")
+            .style.display = "none";
+
+        document
+            .getElementById("after")
+            .classList.remove("hidden");
+
+    },2000);
+}
+
+function createSmoke(){
+
+    const container =
+        document.getElementById("smoke-container");
+
+    for(let i=0;i<40;i++){
+
+        const smoke =
+            document.createElement("div");
+
+        smoke.className = "smoke";
+
+        smoke.style.left =
+            (window.innerWidth / 2 - 60)
+            + (Math.random() * 120 - 60)
+            + "px";
+
+        smoke.style.top =
+            (window.innerHeight / 2 - 60)
+            + (Math.random() * 120 - 60)
+            + "px";
+
+        smoke.style.setProperty(
+            "--dx",
+            (Math.random() * 600 - 300) + "px"
+        );
+
+        smoke.style.setProperty(
+            "--dy",
+            (Math.random() * 400 - 200) + "px"
+        );
+
+        container.appendChild(smoke);
+
+        setTimeout(()=>{
+            smoke.remove();
+        },4000);
+    }
+}
+
+function check(){
+
+    const ans =
+        document.getElementById("answer")
+        .value
+        .trim();
+
+    if(
+        ans === "うた" ||
+        ans === "歌"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "正解！";
+
+        nextPage = "step2.html";
+
+        unlockMemory(1);
+
+    }else{
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "違います";
+
+    }
+}
+
+
+
+const memories = {
+
+    1: {
+        title: "記憶①",
+        text: "あなたは確かに玉手箱を開けた。"
+    },
+
+    2: {
+        title: "記憶②",
+        text: "乙姫は何かを隠している。"
+    },
+
+    3: {
+        title: "記憶③",
+        text: "失われた記憶が戻り始めている。"
+    }
+
+};
+
+function createMemoryButton(number){
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "memoryButton";
+
+    button.textContent =
+        memories[number].title;
+
+    button.onclick = () => {
+
+        document
+            .getElementById("viewerTitle")
+            .textContent =
+            memories[number].title;
+
+        document
+            .getElementById("viewerText")
+            .textContent =
+            memories[number].text;
+
+        document
+            .getElementById("memoryViewer")
+            .classList.remove("hidden");
+    };
+
+    document
+        .getElementById("memoryPanel")
+        .appendChild(button);
+}
+
+function unlockMemory(number){
+
+    if(
+        localStorage.getItem(
+            "memory"+number
+        ) === "true"
+    ){
+        return;
+    }
+
+    localStorage.setItem(
+        "memory"+number,
+        "true"
+    );
+
+    document
+        .getElementById("memoryText")
+        .textContent =
+        memories[number].text;
+
+    document
+        .getElementById("memoryPopup")
+        .classList.remove("hidden");
+
+    createMemoryButton(number);
+}
+
+function closeMemoryPopup(){
+
+    if(nextPage !== ""){
+
+        location.href = nextPage;
+        return;
+
+    }
+
+    document
+        .getElementById("memoryPopup")
+        .classList.add("hidden");
+}
+
+function closeMemoryViewer(){
+
+    document
+        .getElementById("memoryViewer")
+        .classList.add("hidden");
+}
+
+window.onload = function(){
+
+    for(let i=1;i<=3;i++){
+
+        if(
+            localStorage.getItem(
+                "memory"+i
+            ) === "true"
+        ){
+
+            createMemoryButton(i);
+
+        }
+
+    }
+
+}
+
+window.onload = function(){
+
+    localStorage.clear();
+
+}
+
+
+</script>
+
+</body>
+</html>
