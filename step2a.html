@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>STEP2</title>
+
+<style>
+
+body{
+    font-family:sans-serif;
+    text-align:center;
+    background:#44b9c9;
+    color:white;
+    margin:0;
+    padding:60px 40px 300px 40px;
+}
+
+h1{
+    color:white;
+}
+
+#memoryPanel{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:20px;
+}
+
+.memoryButton{
+
+    padding:8px 15px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:white;
+
+    color:#003344;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,0.7);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:2000;
+}
+
+.modalContent{
+
+    background:white;
+
+    color:black;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    max-width:500px;
+}
+
+.hidden{
+    display:none;
+}
+
+#story{
+
+    max-width:700px;
+
+    margin:auto;
+
+    line-height:1.8;
+
+    color:white;
+
+    border:2px solid white;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    background:rgba(255,255,255,0.05);
+}
+
+input{
+    font-size:20px;
+    padding:10px;
+    width:300px;
+    box-sizing:border-box;
+}
+
+button{
+    font-size:18px;
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+#ground{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:10vh;
+    background:#d3c8b2;
+    z-index:8;
+}
+
+#ryugujo{
+
+    position:fixed;
+
+    left:20px;
+
+    bottom:5vh;
+
+    width:200px;
+
+    z-index:10;
+
+    pointer-events:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="memoryPanel"></div>
+
+<div id="ground"></div>
+
+<img
+    src="ryuuguujyou.png"
+    id="ryugujo"
+    alt="竜宮城">
+
+<h1>STEP2</h1>
+
+<!-- 記憶獲得ポップアップ -->
+<div id="memoryPopup" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2>記憶を思い出した</h2>
+
+        <p id="memoryText"></p>
+
+        <img
+    id="memoryImage"
+    class="hidden"
+    style="
+        max-width:250px;
+        margin-top:15px;
+        border-radius:10px;
+    ">
+
+        <button onclick="closeMemoryPopup()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<div id="memoryViewer" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2 id="viewerTitle"></h2>
+
+        <img
+            id="viewerImage"
+            class="hidden"
+            src=""
+            style="
+                max-width:250px;
+                margin-top:15px;
+                border-radius:10px;
+            ">
+
+        <p id="viewerText"></p>
+
+        <button onclick="closeMemoryViewer()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<div id="story">
+
+    オトヒメはあなたの答えを聞くと、少し安心したような表情を見せた。<br>
+
+    「そうです。その心を忘れないでください。」
+
+    <br>
+    すると、失われていた記憶が
+    少しだけ戻ってきた――。
+
+</div>
+
+<br><br>
+
+<h2>まずは1〜4を解き、5の答えを導いてください。</h2><br>
+
+    <h2>
+        乙姫との約束：
+    <br>
+        「ウラシマと海の生物以外の生物を無視すること」
+    <h2>
+
+<input id="answer">
+
+<button onclick="check()">
+回答
+</button>
+
+<p id="result"></p>
+
+<script>
+    
+
+const memories = {
+
+    1: {
+        title: "記憶①",
+        text: "あなたは釣竿を持っていた。"
+    },
+
+    2: {
+        title: "記憶②",
+        text: "乙姫は何かを隠している。"
+    },
+
+    3: {
+        title: "記憶③",
+        text: "失われた記憶が戻り始めている。"
+    }
+
+};
+
+function createMemoryButton(number){
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "memoryButton";
+
+    button.textContent =
+        memories[number].title;
+
+    button.onclick = () => {
+
+    document
+        .getElementById("viewerTitle")
+        .textContent =
+        memories[number].title;
+
+    document
+        .getElementById("viewerText")
+        .textContent =
+        memories[number].text;
+
+    const img =
+        document.getElementById("viewerImage");
+
+    if(number === 1){
+
+        img.src = "turizao.png";
+
+        img.classList.remove("hidden");
+
+    }else{
+
+        img.classList.add("hidden");
+
+    }
+
+    document
+        .getElementById("memoryViewer")
+        .classList.remove("hidden");
+};
+
+    document
+        .getElementById("memoryPanel")
+        .appendChild(button);
+}
+
+function unlockMemory(number){
+
+    if(
+        localStorage.getItem(
+            "memory"+number
+        ) === "true"
+    ){
+        return;
+    }
+
+    localStorage.setItem(
+        "memory"+number,
+        "true"
+    );
+
+    document
+        .getElementById("memoryText")
+        .textContent =
+        memories[number].text;
+
+        const img =
+    document.getElementById("memoryImage");
+
+if(number === 1){
+
+    img.src = "turizao.png";
+    img.classList.remove("hidden");
+
+}else{
+
+    img.classList.add("hidden");
+
+}
+
+    document
+        .getElementById("memoryPopup")
+        .classList.remove("hidden");
+
+    createMemoryButton(number);
+}
+
+
+
+
+function closeMemoryPopup(){
+
+    if(nextPage !== ""){
+
+        location.href = nextPage;
+        return;
+
+    }
+
+    document
+        .getElementById("memoryPopup")
+        .classList.add("hidden");
+}
+
+function closeMemoryViewer(){
+
+    document
+        .getElementById("memoryViewer")
+        .classList.add("hidden");
+}
+
+function startFog(){
+
+    document
+        .getElementById("fogLeft")
+        .style.display = "block";
+
+    document
+        .getElementById("fogRight")
+        .style.display = "block";
+
+    setInterval(()=>{
+
+        createFog("fogLeft");
+
+        createFog("fogRight");
+
+    },1000);
+}
+
+function createFog(id){
+
+    const area =
+        document.getElementById(id);
+
+    const fog =
+        document.createElement("div");
+
+    fog.className = "fog";
+
+    fog.style.left =
+        Math.random()*100 + "px";
+
+    area.appendChild(fog);
+
+    setTimeout(()=>{
+        fog.remove();
+    },10000);
+}
+
+window.onload = function(){
+
+    for(let i=1;i<=3;i++){
+
+        if(
+            localStorage.getItem(
+                "memory"+i
+            ) === "true"
+        ){
+
+            createMemoryButton(i);
+
+        }
+
+    }
+
+}
+
+window.onload = function(){
+
+    localStorage.clear();
+
+}
+
+function check(){
+
+    const ans =
+        document
+        .getElementById("answer")
+        .value
+        .trim();
+
+    if(
+        ans === "いこく"||
+        ans === "イコク"||
+        ans === "異国"||
+        ans === "いらく"||
+        ans === "イラク"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "1正解";
+
+        setTimeout(()=>{
+
+            location.href =
+            "step3.html";
+
+        },1000);
+
+    }
+
+    if(
+        ans === "くぶん"||
+        ans === "クブン"||
+        ans === "区分"||
+        ans === "ちたん"||
+        ans === "チタン"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "2正解";
+
+        setTimeout(()=>{
+
+            location.href =
+            "step3.html";
+
+        },1000);
+
+    }
+
+    if(
+        ans === "こらい"||
+        ans === "コライ"||
+        ans === "古来"||
+        ans === "らんち"||
+        ans === "ランチ"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "3正解";
+
+        setTimeout(()=>{
+
+            location.href =
+            "step3.html";
+
+        },1000);
+
+    }
+
+    if(
+        ans === "ちくわ"||
+        ans === "チクワ"||
+        ans === "たいわ"||
+        ans === "タイワ"||
+        ans === "対話"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "4正解";
+
+        setTimeout(()=>{
+
+            location.href =
+            "step3.html";
+
+        },1000);
+
+    }
+
+    // E1
+    if(
+        ans === "こぶら"||
+        ans === "コブラ"||
+        ans === "くらぶ"||
+        ans === "クラブ"
+    ){
+
+        unlockMemory(1);
+
+        nextPage = "step3a.html";
+
+        return;
+    }
+
+    // E2
+    if(
+        ans === "らいん"||
+        ans === "ライン"||
+        ans === "たんい"||
+        ans === "タンイ"||
+        ans === "単位"
+    ){
+
+        createSmoke();
+
+        setTimeout(()=>{
+
+            location.href =
+            "step3b.html";
+
+        },2000);
+
+        return;
+    }
+    
+    
+    else{
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "不正解";
+
+    }
+
+}
+
+
+
+
+</script>
+
+</body>
+</html>
