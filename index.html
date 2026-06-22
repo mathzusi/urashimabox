@@ -12,7 +12,7 @@ body{
     text-align:center;
     background:#44b9c9;
     margin:0;
-    padding:60px 40px 40px 40px;
+    padding:60px 40px 300px 40px;
     transition:1s;
 }
 
@@ -326,6 +326,15 @@ input{
 
         <p id="memoryText"></p>
 
+        <img
+    id="memoryImage"
+    class="hidden"
+    style="
+        max-width:250px;
+        margin-top:15px;
+        border-radius:10px;
+    ">
+
         <button onclick="closeMemoryPopup()">
             閉じる
         </button>
@@ -340,6 +349,16 @@ input{
     <div class="modalContent">
 
         <h2 id="viewerTitle"></h2>
+
+        <img
+    id="viewerImage"
+    class="hidden"
+    src=""
+    style="
+        max-width:250px;
+        margin-top:15px;
+        border-radius:10px;
+    ">
 
         <p id="viewerText"></p>
 
@@ -370,24 +389,25 @@ input{
 
      <div id="stepStory">
 
-        箱を開けた瞬間、白い煙があたりを包み、気づいた時には僕は再び竜宮城にいた。<br>
+        箱を開けた瞬間、白い煙があたりを包み、気づいた時には僕は竜宮城にいた。<br>
+        色々な記憶が薄れている気がする。ただ、竜宮城に前に来たことがあるのは覚えている。<br>
         「...なんでまたここに来たんだろう？」<br>
         思わずつぶいた時、声が僕の後ろからした。<br>
         「箱を開けてしまったのですか！？開けてはいけないと言ったでしょう...。」<br>
         オトヒメだ。聞き馴染みのある声に僕は安心した。<br>
-        「安心した顔をしている場合じゃありません！あなたが開けた箱に入っていた煙は人間を老けさせてしまう煙...。ここに長くいると老けて死んでしまいますわ！」<br>
+        「安心した顔をしている場合じゃありません！あなたが開けた箱に入っていた煙は人間を急速に老けさせてしまう煙...。ここに長くいると死んでしまいますわ！」<br>
         「えっ！？じゃあなんでそんな危険な箱を僕に...」<br>
         「今はそんなことを気にしている場合じゃありません！ええっと、どこだったかしら...。」<br>
         オトヒメは忙しそうに駆け巡り、何かを探している。<br>
         「あった！ウラシマ、あなたがまだ助かる方法があります。良いですか？この暗号を解いて、私に答えを伝えるのです。」<br>
-        僕は色々と聞きたいことがあったが、オトヒメの真剣さを感じ、それは飲み込み、静かに頷いた。<br>
+        僕は色々聞きたいことがあったが、オトヒメの真剣さを感じ、それは飲み込んで静かに頷いた。<br>
 
-        「ただし、ただ解いて良いわけではありません。暗号を解くときは、<h2>”絶対に私との約束に従うこと”</h2>
+        「ただし、ただ解いて良いわけではありません。暗号を解くときは、<h2>”私との約束に従うこと”</h2>
         ...絶対に守るのですよ？
 
     </div>
 
-    <h2>まずはA〜Dを解き、Eの答えを導いてください。</h2>
+    <h2>まずはA〜Dを解き、Eの答えを導いてください。</h2><br>
 
     <h2>
         乙姫との約束：
@@ -589,7 +609,7 @@ const memories = {
 
     1: {
         title: "記憶①",
-        text: "あなたは確かに玉手箱を開けた。"
+        text: "あなたは釣竿を持っていた。"
     },
 
     2: {
@@ -617,20 +637,35 @@ function createMemoryButton(number){
 
     button.onclick = () => {
 
-        document
-            .getElementById("viewerTitle")
-            .textContent =
-            memories[number].title;
+    document
+        .getElementById("viewerTitle")
+        .textContent =
+        memories[number].title;
 
-        document
-            .getElementById("viewerText")
-            .textContent =
-            memories[number].text;
+    document
+        .getElementById("viewerText")
+        .textContent =
+        memories[number].text;
 
-        document
-            .getElementById("memoryViewer")
-            .classList.remove("hidden");
-    };
+    const img =
+        document.getElementById("viewerImage");
+
+    if(number === 1){
+
+        img.src = "turizao.png";
+
+        img.classList.remove("hidden");
+
+    }else{
+
+        img.classList.add("hidden");
+
+    }
+
+    document
+        .getElementById("memoryViewer")
+        .classList.remove("hidden");
+};
 
     document
         .getElementById("memoryPanel")
@@ -657,12 +692,29 @@ function unlockMemory(number){
         .textContent =
         memories[number].text;
 
+        const img =
+    document.getElementById("memoryImage");
+
+if(number === 1){
+
+    img.src = "turizao.png";
+    img.classList.remove("hidden");
+
+}else{
+
+    img.classList.add("hidden");
+
+}
+
     document
         .getElementById("memoryPopup")
         .classList.remove("hidden");
 
     createMemoryButton(number);
 }
+
+
+
 
 function closeMemoryPopup(){
 
