@@ -10,7 +10,7 @@
 body{
     font-family:sans-serif;
     text-align:center;
-    background:#6dc3d0;
+    background:#44b9c9;
     margin:0;
     padding:60px 40px 40px 40px;
     transition:1s;
@@ -28,7 +28,7 @@ body{
 
     height:auto;
 
-    z-index:0;
+    z-index:10;
 
     pointer-events:none;
 }
@@ -39,18 +39,36 @@ body{
     left:0;
     width:100%;
     height:10vh;
-    background:#b4945a;
-    z-index:-1;
+    background:#d3c8b2;
+    z-index:8;
 }
 
 h1{
-    color:#005577;
+    color:white;
 }
 
-#story{
+h2{
+    color:white;
+}
+
+#story,
+#stepStory{
+
     max-width:700px;
+
     margin:auto;
+
     line-height:1.8;
+
+    color:white;
+
+    border:2px solid white;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    background:rgba(255,255,255,0.05);
 }
 
 button{
@@ -92,6 +110,25 @@ input{
     gap:10px;
 }
 
+
+#boxButton{
+
+    margin-top:50px;
+
+    background:#2b2b2b;
+
+    color:#ff61a0;
+
+    border:2px solid #fdfdfd;
+
+    border-radius:12px;
+
+    padding:12px 30px;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
 
 .memoryButton{
 
@@ -148,6 +185,72 @@ input{
     display:none;
 }
 
+#fogLeft,
+#fogRight{
+
+    position:fixed;
+
+    bottom:0;
+
+    width:250px;
+
+    height:100vh;
+
+    pointer-events:none;
+
+    display:none;
+
+    z-index:5;
+}
+
+#fogLeft{
+    left:0;
+}
+
+#fogRight{
+    right:0;
+}
+
+.fog{
+
+    position:absolute;
+
+    bottom:-100px;
+
+    width:180px;
+
+    height:180px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.6) 0%,
+            rgba(255,255,255,0.3) 60%,
+            rgba(255,255,255,0) 100%
+        );
+
+    animation:fogRise 10s linear forwards;
+}
+
+@keyframes fogRise{
+
+    from{
+        transform:translateY(0) scale(0.6);
+        opacity:0;
+    }
+
+    20%{
+        opacity:0.8;
+    }
+
+    to{
+        transform:translateY(-800px) scale(2);
+        opacity:0;
+    }
+}
+
 #smoke-container{
     position:fixed;
     inset:0;
@@ -197,7 +300,16 @@ input{
 
 <body>
 
+<body>
+
+<div id="memoryPanel"></div>
+
 <div id="ground"></div>
+
+<div id="ground"></div>
+
+<div id="fogLeft"></div>
+<div id="fogRight"></div>
 
 <img
     src="ryuuguujyou.png"
@@ -239,14 +351,12 @@ input{
 
 </div>
 
-<h1>STEP1</h1>
+<h1 id="title">STORY</h1>
 
 <div id="story">
-    昔々、浦島太郎は亀を助けました。<br>
-    お礼に竜宮城へ招かれ、楽しい時間を過ごしました。<br><br>
-
-    帰るとき、乙姫様から玉手箱を渡されました。<br>
-    「決して開けてはいけません」
+    竜宮城を満喫して帰ってきたばかりのウラシマ。<br>
+    オトヒメから「開けてはいけない」と言われてこの箱を貰ったけど...。<br>
+    気になるから開けちゃおう！
 </div>
 
 <div id="smoke-container"></div>
@@ -258,11 +368,32 @@ input{
 
 <div id="after" class="hidden">
 
-    <h2>あなたは箱を開けてしまった！</h2>
+     <div id="stepStory">
 
-    <p>
-        答えを入力してください
-    </p>
+        箱を開けた瞬間、白い煙があたりを包み、気づいた時には僕は再び竜宮城にいた。<br>
+        「...なんでまたここに来たんだろう？」<br>
+        思わずつぶいた時、声が僕の後ろからした。<br>
+        「箱を開けてしまったのですか！？開けてはいけないと言ったでしょう...。」<br>
+        オトヒメだ。聞き馴染みのある声に僕は安心した。<br>
+        「安心した顔をしている場合じゃありません！あなたが開けた箱に入っていた煙は人間を老けさせてしまう煙...。ここに長くいると老けて死んでしまいますわ！」<br>
+        「えっ！？じゃあなんでそんな危険な箱を僕に...」<br>
+        「今はそんなことを気にしている場合じゃありません！ええっと、どこだったかしら...。」<br>
+        オトヒメは忙しそうに駆け巡り、何かを探している。<br>
+        「あった！ウラシマ、あなたがまだ助かる方法があります。良いですか？この暗号を解いて、私に答えを伝えるのです。」<br>
+        僕は色々と聞きたいことがあったが、オトヒメの真剣さを感じ、それは飲み込み、静かに頷いた。<br>
+
+        「ただし、ただ解いて良いわけではありません。暗号を解くときは、<h2>”絶対に私との約束に従うこと”</h2>
+        ...絶対に守るのですよ？
+
+    </div>
+
+    <h2>まずはA〜Dを解き、Eの答えを導いてください。</h2>
+
+    <h2>
+        乙姫との約束：
+    <br>
+        「ピースの白い面は使わないこと」
+    <h2>
 
     <input id="answer">
 
@@ -277,15 +408,16 @@ input{
 
 <script>
 
-let nextPage = "";
-
 function openBox(){
 
     createSmoke();
 
     setTimeout(()=>{
 
-        document.body.classList.add("old");
+        document
+            .getElementById("title")
+            .innerHTML =
+            "STEP1";
 
         document
             .getElementById("story")
@@ -298,6 +430,8 @@ function openBox(){
         document
             .getElementById("after")
             .classList.remove("hidden");
+
+        startFog();
 
     },2000);
 }
@@ -345,34 +479,110 @@ function createSmoke(){
 function check(){
 
     const ans =
-        document.getElementById("answer")
+        document
+        .getElementById("answer")
         .value
-        .trim();
+        .trim()
+        .toLowerCase();
 
+    // A
     if(
-        ans === "うた" ||
-        ans === "歌"
+        ans === "竜宮城" ||
+        ans === "りゅうぐうじょう" ||
+        ans === "リュウグウジョウ"
     ){
 
         document
             .getElementById("result")
             .innerHTML =
-            "正解！";
+            "A正解";
 
-        nextPage = "step2.html";
+        return;
+    }
 
-        unlockMemory(1);
-
-    }else{
+    // B
+    if(
+        ans === "ウラシマ" ||
+        ans === "うらしま" ||
+        ans === "浦島"
+    ){
 
         document
             .getElementById("result")
             .innerHTML =
-            "違います";
+            "B正解";
 
+        return;
     }
-}
 
+    // C
+    if(
+        ans === "ミドリ" ||
+        ans === "みどり" ||
+        ans === "緑"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "C正解";
+
+        return;
+    }
+
+    // D
+    if(
+        ans === "ひらがな"||
+        ans === "ヒラガナ"||
+        ans === "平仮名"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "D正解";
+
+        return;
+    }
+
+    // E1
+    if(
+        ans === "せいじつ"||
+        ans === "セイジツ"||
+        ans === "誠実"
+    ){
+
+        unlockMemory(1);
+
+        nextPage = "step2a.html";
+
+        return;
+    }
+
+    // E2
+    if(
+        ans === "くろう"||
+        ans === "クロウ"||
+        ans === "苦労"
+    ){
+
+        createSmoke();
+
+        setTimeout(()=>{
+
+            location.href =
+            "step2b.html";
+
+        },2000);
+
+        return;
+    }
+
+    document
+        .getElementById("result")
+        .innerHTML =
+        "不正解";
+}
 
 
 const memories = {
@@ -473,6 +683,45 @@ function closeMemoryViewer(){
     document
         .getElementById("memoryViewer")
         .classList.add("hidden");
+}
+
+function startFog(){
+
+    document
+        .getElementById("fogLeft")
+        .style.display = "block";
+
+    document
+        .getElementById("fogRight")
+        .style.display = "block";
+
+    setInterval(()=>{
+
+        createFog("fogLeft");
+
+        createFog("fogRight");
+
+    },1000);
+}
+
+function createFog(id){
+
+    const area =
+        document.getElementById(id);
+
+    const fog =
+        document.createElement("div");
+
+    fog.className = "fog";
+
+    fog.style.left =
+        Math.random()*100 + "px";
+
+    area.appendChild(fog);
+
+    setTimeout(()=>{
+        fog.remove();
+    },10000);
 }
 
 window.onload = function(){
