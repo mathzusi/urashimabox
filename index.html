@@ -51,6 +51,10 @@ h2{
     color:white;
 }
 
+#result{
+    color:white;
+}
+
 #story,
 #stepStory{
 
@@ -149,7 +153,9 @@ input{
     cursor:pointer;
 }
 
-
+.modalContent h2{
+    color:black;
+}
 
 .modal{
 
@@ -179,6 +185,8 @@ input{
     border-radius:15px;
 
     max-width:500px;
+
+    width:80%;
 }
 
 .hidden{
@@ -298,13 +306,11 @@ input{
 </style>
 </head>
 
-<body>
 
 <body>
 
 <div id="memoryPanel"></div>
 
-<div id="ground"></div>
 
 <div id="ground"></div>
 
@@ -316,51 +322,24 @@ input{
     id="ryugujo"
     alt="竜宮城">
 
-
-<!-- 記憶獲得ポップアップ -->
-<div id="memoryPopup" class="modal hidden">
-
-    <div class="modalContent">
-
-        <h2>記憶を思い出した</h2>
-
-        <p id="memoryText"></p>
-
-        <img
-    id="memoryImage"
-    class="hidden"
-    style="
-        max-width:250px;
-        margin-top:15px;
-        border-radius:10px;
-    ">
-
-        <button onclick="closeMemoryPopup()">
-            閉じる
-        </button>
-
-    </div>
-
-</div>
-
-<!-- 記憶閲覧ポップアップ -->
+<!-- 記憶ポップアップ -->
 <div id="memoryViewer" class="modal hidden">
 
     <div class="modalContent">
 
         <h2 id="viewerTitle"></h2>
 
-        <img
-    id="viewerImage"
-    class="hidden"
-    src=""
-    style="
-        max-width:250px;
-        margin-top:15px;
-        border-radius:10px;
-    ">
-
         <p id="viewerText"></p>
+
+        <img
+            id="viewerImage"
+            class="hidden"
+            src=""
+            style="
+                max-width:250px;
+                margin-top:15px;
+                border-radius:10px;
+            ">
 
         <button onclick="closeMemoryViewer()">
             閉じる
@@ -389,6 +368,7 @@ input{
 
      <div id="stepStory">
 
+        <p>
         箱を開けた瞬間、白い煙があたりを包み、気づいた時には僕は竜宮城にいた。<br>
         色々な記憶が薄れている気がする。ただ、竜宮城に前に来たことがあるのは覚えている。<br>
         「...なんでまたここに来たんだろう？」<br>
@@ -402,8 +382,14 @@ input{
         「あった！ウラシマ、あなたがまだ助かる方法があります。良いですか？この暗号を解いて、私に答えを伝えるのです。」<br>
         僕は色々聞きたいことがあったが、オトヒメの真剣さを感じ、それは飲み込んで静かに頷いた。<br>
 
-        「ただし、ただ解いて良いわけではありません。暗号を解くときは、<h2>”私との約束に従うこと”</h2>
-        ...絶対に守るのですよ？
+        「ただし、ただ解いて良いわけではありません。暗号を解くときは、
+        </p>
+
+        <h2>”私との約束に従うこと”</h2>
+
+        <p>
+        ...絶対に守るのですよ？」
+        </p>
 
     </div>
 
@@ -413,7 +399,7 @@ input{
         乙姫との約束：
     <br>
         「ピースの白い面は使わないこと」
-    <h2>
+    </h2>
 
     <input id="answer">
 
@@ -427,6 +413,8 @@ input{
 
 
 <script>
+
+let nextPage = "";
 
 function openBox(){
 
@@ -636,11 +624,22 @@ function createMemoryButton(number){
         memories[number].title;
 
     button.onclick = () => {
+    showMemory(number);
+};
+
+    document
+        .getElementById("memoryPanel")
+        .appendChild(button);
+}
+
+function showMemory(number, isNew = false){
 
     document
         .getElementById("viewerTitle")
         .textContent =
-        memories[number].title;
+        isNew
+        ? memories[number].title + "を手に入れた。"
+        : memories[number].title;
 
     document
         .getElementById("viewerText")
@@ -653,7 +652,6 @@ function createMemoryButton(number){
     if(number === 1){
 
         img.src = "turizao.png";
-
         img.classList.remove("hidden");
 
     }else{
@@ -665,11 +663,6 @@ function createMemoryButton(number){
     document
         .getElementById("memoryViewer")
         .classList.remove("hidden");
-};
-
-    document
-        .getElementById("memoryPanel")
-        .appendChild(button);
 }
 
 function unlockMemory(number){
@@ -687,47 +680,9 @@ function unlockMemory(number){
         "true"
     );
 
-    document
-        .getElementById("memoryText")
-        .textContent =
-        memories[number].text;
-
-        const img =
-    document.getElementById("memoryImage");
-
-if(number === 1){
-
-    img.src = "turizao.png";
-    img.classList.remove("hidden");
-
-}else{
-
-    img.classList.add("hidden");
-
-}
-
-    document
-        .getElementById("memoryPopup")
-        .classList.remove("hidden");
-
     createMemoryButton(number);
-}
-
-
-
-
-function closeMemoryPopup(){
-
-    if(nextPage !== ""){
-
-        location.href = nextPage;
-        return;
-
-    }
-
-    document
-        .getElementById("memoryPopup")
-        .classList.add("hidden");
+    
+    showMemory(number, true);
 }
 
 function closeMemoryViewer(){
@@ -735,6 +690,11 @@ function closeMemoryViewer(){
     document
         .getElementById("memoryViewer")
         .classList.add("hidden");
+
+    if(nextPage !== ""){
+
+        location.href = nextPage;
+    }
 }
 
 function startFog(){
@@ -794,14 +754,11 @@ window.onload = function(){
 
 }
 
-window.onload = function(){
-
-    localStorage.clear();
-
-}
-
-
 </script>
+
+<button onclick="localStorage.clear();location.reload();">
+記憶リセット
+</button>
 
 </body>
 </html>
