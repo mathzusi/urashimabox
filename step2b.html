@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>STEP2</title>
+
+<style>
+
+body{
+    font-family:sans-serif;
+    text-align:center;
+    background:#44b9c9;
+    color:white;
+    margin:0;
+    padding:60px 40px 300px 40px;
+}
+
+h1{
+    color:white;
+}
+
+#memoryPanel{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:20px;
+}
+
+.memoryButton{
+
+    padding:8px 15px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:white;
+
+    color:#003344;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,0.7);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:2000;
+}
+
+.modalContent{
+
+    background:white;
+
+    color:black;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    max-width:500px;
+
+    width:80%;
+}
+
+.hidden{
+    display:none;
+}
+
+#story{
+
+    max-width:700px;
+
+    margin:auto;
+
+    line-height:1.8;
+
+    color:white;
+
+    border:2px solid white;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    background:rgba(255,255,255,0.05);
+}
+
+input{
+    font-size:20px;
+    padding:10px;
+    width:300px;
+    box-sizing:border-box;
+}
+
+button{
+    font-size:18px;
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+#ground{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:10vh;
+    background:#d3c8b2;
+    z-index:8;
+}
+
+#ryugujo{
+
+    position:fixed;
+
+    left:20px;
+
+    bottom:5vh;
+
+    width:200px;
+
+    z-index:10;
+
+    pointer-events:none;
+}
+
+#fogLeft,
+#fogRight{
+
+    position:fixed;
+
+    bottom:0;
+
+    width:250px;
+
+    height:100vh;
+
+    pointer-events:none;
+
+    display:none;
+
+    z-index:5;
+}
+
+#fogLeft{
+    left:0;
+}
+
+#fogRight{
+    right:0;
+}
+
+.fog{
+
+    position:absolute;
+
+    bottom:-100px;
+
+    width:180px;
+
+    height:180px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.6) 0%,
+            rgba(255,255,255,0.3) 60%,
+            rgba(255,255,255,0) 100%
+        );
+
+    animation:fogRise 10s linear forwards;
+}
+
+@keyframes fogRise{
+
+    from{
+        transform:translateY(0) scale(0.6);
+        opacity:0;
+    }
+
+    20%{
+        opacity:0.8;
+    }
+
+    to{
+        transform:translateY(-800px) scale(2);
+        opacity:0;
+    }
+}
+
+#smoke-container{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:9999;
+}
+
+.smoke{
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.95) 0%,
+            rgba(255,255,255,0.7) 50%,
+            rgba(255,255,255,0) 100%
+        );
+
+    animation:puff 4s ease-out forwards;
+}
+
+@keyframes puff{
+
+    0%{
+        transform:translate(0,0) scale(0.2);
+        opacity:0;
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        transform:
+            translate(var(--dx), var(--dy))
+            scale(4);
+        opacity:0;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="fogLeft"></div>
+<div id="fogRight"></div>
+
+<div id="smoke-container"></div>
+
+<div id="memoryPanel"></div>
+
+<div id="ground"></div>
+
+<img
+    src="ryuuguujyou.png"
+    id="ryugujo"
+    alt="竜宮城">
+
+<h1>STEP2</h1>
+
+<!-- 記憶ポップアップ -->
+
+<div id="memoryViewer" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2 id="viewerTitle"></h2>
+
+        <p id="viewerText"></p>
+
+        <img
+            id="viewerImage"
+            class="hidden"
+            src=""
+            style="
+                max-width:250px;
+                margin-top:15px;
+                border-radius:10px;
+            ">
+
+        <button onclick="closeMemoryViewer()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<div id="story">
+
+    「約束を...破ってしまったのですね...。」<br>
+    オトヒメは悲しそうに言った。<br>
+    ただ、想像していたよりあまり気にしていないようにも見えた。<br>
+    「さあ、次の謎はこちらです。」
+
+</div>
+
+<br><br>
+
+<h2>まずは1〜4を解き、5の答えを導いてください。</h2><br>
+
+    <h2>
+        乙姫との約束：
+    <br>
+        「ウラシマと海の生物以外の生物を無視すること」
+    </h2>
+
+<input id="answer">
+
+<button onclick="check()">
+回答
+</button>
+
+<p id="result"></p>
+
+<script>
+    
+
+const memories = {
+
+    1:{
+        title:"記憶①",
+        text:"あなたは釣竿を持っていた。"
+    },
+
+    2:{
+        title:"記憶②",
+        text:"乙姫は何かを隠している。"
+    },
+
+    3:{
+        title:"記憶③",
+        text:"失われた記憶が戻り始めている。"
+    }
+};
+
+function createMemoryButton(number){
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "memoryButton";
+
+    button.textContent =
+        memories[number].title;
+
+    button.onclick = () => {
+    showMemory(number);
+};
+
+    document
+        .getElementById("memoryPanel")
+        .appendChild(button);
+}
+
+function showMemory(number, isNew = false){
+
+    document
+        .getElementById("viewerTitle")
+        .textContent =
+        isNew
+        ? memories[number].title + "を手に入れた。"
+        : memories[number].title;
+
+    document
+        .getElementById("viewerText")
+        .textContent =
+        memories[number].text;
+
+    const img =
+        document.getElementById("viewerImage");
+
+    if(number === 1){
+
+        img.src = "turizao.png";
+        img.classList.remove("hidden");
+
+    }else{
+
+        img.classList.add("hidden");
+
+    }
+
+    document
+        .getElementById("memoryViewer")
+        .classList.remove("hidden");
+}
+
+let nextPage = "";
+
+function unlockMemory(number){
+
+    if(
+        localStorage.getItem(
+            "memory"+number
+        ) === "true"
+    ){
+        return;
+    }
+
+    localStorage.setItem(
+        "memory"+number,
+        "true"
+    );
+
+    createMemoryButton(number);
+
+    showMemory(number,true);
+}
+
+function closeMemoryViewer(){
+
+    document
+        .getElementById("memoryViewer")
+        .classList.add("hidden");
+
+    if(nextPage !== ""){
+
+        location.href = nextPage;
+    }
+}
+
+function startFog(){
+
+    document
+        .getElementById("fogLeft")
+        .style.display = "block";
+
+    document
+        .getElementById("fogRight")
+        .style.display = "block";
+
+    setInterval(()=>{
+
+        createFog("fogLeft");
+
+        createFog("fogRight");
+
+    },1000);
+}
+
+function createFog(id){
+
+    const area =
+        document.getElementById(id);
+
+    const fog =
+        document.createElement("div");
+
+    fog.className = "fog";
+
+    fog.style.left =
+        Math.random()*100 + "px";
+
+    area.appendChild(fog);
+
+    setTimeout(()=>{
+        fog.remove();
+    },10000);
+}
+
+window.onload = function(){
+
+    for(let i=1;i<=3;i++){
+
+        if(
+            localStorage.getItem(
+                "memory"+i
+            ) === "true"
+        ){
+
+            createMemoryButton(i);
+
+        }
+
+    }
+
+    startFog();
+}
+
+function createSmoke(){
+
+    const container =
+        document.getElementById("smoke-container");
+
+    for(let i=0;i<40;i++){
+
+        const smoke =
+            document.createElement("div");
+
+        smoke.className = "smoke";
+
+        smoke.style.left =
+            (window.innerWidth / 2 - 60)
+            + (Math.random() * 120 - 60)
+            + "px";
+
+        smoke.style.top =
+            (window.innerHeight / 2 - 60)
+            + (Math.random() * 120 - 60)
+            + "px";
+
+        smoke.style.setProperty(
+            "--dx",
+            (Math.random() * 600 - 300) + "px"
+        );
+
+        smoke.style.setProperty(
+            "--dy",
+            (Math.random() * 400 - 200) + "px"
+        );
+
+        container.appendChild(smoke);
+
+        setTimeout(()=>{
+            smoke.remove();
+        },4000);
+    }
+}
+
+
+function check(){
+
+    const ans =
+        document
+        .getElementById("answer")
+        .value
+        .trim();
+
+    if(
+        ans === "いこく"||
+        ans === "イコク"||
+        ans === "異国"||
+        ans === "いらく"||
+        ans === "イラク"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "1正解";
+
+        return;
+
+    }
+
+    if(
+        ans === "くぶん"||
+        ans === "クブン"||
+        ans === "区分"||
+        ans === "ちたん"||
+        ans === "チタン"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "2正解";
+
+        return;
+
+    }
+
+    if(
+        ans === "こらい"||
+        ans === "コライ"||
+        ans === "古来"||
+        ans === "らんち"||
+        ans === "ランチ"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "3正解";
+    
+        return;
+
+    }
+
+    if(
+        ans === "ちくわ"||
+        ans === "チクワ"||
+        ans === "たいわ"||
+        ans === "タイワ"||
+        ans === "対話"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "4正解";
+
+        return;
+
+    }
+
+    // E1
+    if(
+        ans === "こぶら"||
+        ans === "コブラ"||
+        ans === "くらぶ"||
+        ans === "クラブ"
+    ){
+
+        unlockMemory(2);
+
+        nextPage = "step3a.html";
+
+        return;
+    }
+
+    // E2
+    if(
+        ans === "らいん"||
+        ans === "ライン"||
+        ans === "たんい"||
+        ans === "タンイ"||
+        ans === "単位"
+    ){
+
+        createSmoke();
+
+        setTimeout(()=>{
+
+            location.href =
+            "step3b.html";
+
+        },2000);
+
+        return;
+    }
+    
+    
+    else{
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "不正解";
+
+    }
+
+}
+
+
+</script>
+
+</body>
+</html>
