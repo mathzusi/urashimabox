@@ -75,6 +75,8 @@ h1{
     border-radius:15px;
 
     max-width:500px;
+
+    width:80%;
 }
 
 .hidden{
@@ -138,10 +140,125 @@ button{
     pointer-events:none;
 }
 
+#fogLeft,
+#fogRight{
+
+    position:fixed;
+
+    bottom:0;
+
+    width:250px;
+
+    height:100vh;
+
+    pointer-events:none;
+
+    display:none;
+
+    z-index:5;
+}
+
+#fogLeft{
+    left:0;
+}
+
+#fogRight{
+    right:0;
+}
+
+.fog{
+
+    position:absolute;
+
+    bottom:-100px;
+
+    width:180px;
+
+    height:180px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.6) 0%,
+            rgba(255,255,255,0.3) 60%,
+            rgba(255,255,255,0) 100%
+        );
+
+    animation:fogRise 10s linear forwards;
+}
+
+@keyframes fogRise{
+
+    from{
+        transform:translateY(0) scale(0.6);
+        opacity:0;
+    }
+
+    20%{
+        opacity:0.8;
+    }
+
+    to{
+        transform:translateY(-800px) scale(2);
+        opacity:0;
+    }
+}
+
+#smoke-container{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:9999;
+}
+
+.smoke{
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.95) 0%,
+            rgba(255,255,255,0.7) 50%,
+            rgba(255,255,255,0) 100%
+        );
+
+    animation:puff 4s ease-out forwards;
+}
+
+@keyframes puff{
+
+    0%{
+        transform:translate(0,0) scale(0.2);
+        opacity:0;
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        transform:
+            translate(var(--dx), var(--dy))
+            scale(4);
+        opacity:0;
+    }
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="fogLeft"></div>
+<div id="fogRight"></div>
+
+<div id="smoke-container"></div>
 
 <div id="memoryPanel"></div>
 
@@ -154,37 +271,15 @@ button{
 
 <h1>STEP2</h1>
 
-<!-- 記憶獲得ポップアップ -->
-<div id="memoryPopup" class="modal hidden">
-
-    <div class="modalContent">
-
-        <h2>記憶を思い出した</h2>
-
-        <p id="memoryText"></p>
-
-        <img
-    id="memoryImage"
-    class="hidden"
-    style="
-        max-width:250px;
-        margin-top:15px;
-        border-radius:10px;
-    ">
-
-        <button onclick="closeMemoryPopup()">
-            閉じる
-        </button>
-
-    </div>
-
-</div>
+<!-- 記憶ポップアップ -->
 
 <div id="memoryViewer" class="modal hidden">
 
     <div class="modalContent">
 
         <h2 id="viewerTitle"></h2>
+
+        <p id="viewerText"></p>
 
         <img
             id="viewerImage"
@@ -195,8 +290,6 @@ button{
                 margin-top:15px;
                 border-radius:10px;
             ">
-
-        <p id="viewerText"></p>
 
         <button onclick="closeMemoryViewer()">
             閉じる
@@ -223,7 +316,7 @@ button{
         乙姫との約束：
     <br>
         「ウラシマと海の生物以外の生物を無視すること」
-    <h2>
+    </h2>
 
 <input id="answer">
 
@@ -238,21 +331,20 @@ button{
 
 const memories = {
 
-    1: {
-        title: "記憶①",
-        text: "あなたは釣竿を持っていた。"
+    1:{
+        title:"記憶①",
+        text:"あなたは釣竿を持っていた。"
     },
 
-    2: {
-        title: "記憶②",
-        text: "乙姫は何かを隠している。"
+    2:{
+        title:"記憶②",
+        text:"乙姫は何かを隠している。"
     },
 
-    3: {
-        title: "記憶③",
-        text: "失われた記憶が戻り始めている。"
+    3:{
+        title:"記憶③",
+        text:"失われた記憶が戻り始めている。"
     }
-
 };
 
 function createMemoryButton(number){
@@ -267,11 +359,22 @@ function createMemoryButton(number){
         memories[number].title;
 
     button.onclick = () => {
+    showMemory(number);
+};
+
+    document
+        .getElementById("memoryPanel")
+        .appendChild(button);
+}
+
+function showMemory(number, isNew = false){
 
     document
         .getElementById("viewerTitle")
         .textContent =
-        memories[number].title;
+        isNew
+        ? memories[number].title + "を手に入れた。"
+        : memories[number].title;
 
     document
         .getElementById("viewerText")
@@ -284,7 +387,6 @@ function createMemoryButton(number){
     if(number === 1){
 
         img.src = "turizao.png";
-
         img.classList.remove("hidden");
 
     }else{
@@ -296,12 +398,9 @@ function createMemoryButton(number){
     document
         .getElementById("memoryViewer")
         .classList.remove("hidden");
-};
-
-    document
-        .getElementById("memoryPanel")
-        .appendChild(button);
 }
+
+let nextPage = "";
 
 function unlockMemory(number){
 
@@ -318,47 +417,9 @@ function unlockMemory(number){
         "true"
     );
 
-    document
-        .getElementById("memoryText")
-        .textContent =
-        memories[number].text;
-
-        const img =
-    document.getElementById("memoryImage");
-
-if(number === 1){
-
-    img.src = "turizao.png";
-    img.classList.remove("hidden");
-
-}else{
-
-    img.classList.add("hidden");
-
-}
-
-    document
-        .getElementById("memoryPopup")
-        .classList.remove("hidden");
-
     createMemoryButton(number);
-}
 
-
-
-
-function closeMemoryPopup(){
-
-    if(nextPage !== ""){
-
-        location.href = nextPage;
-        return;
-
-    }
-
-    document
-        .getElementById("memoryPopup")
-        .classList.add("hidden");
+    showMemory(number,true);
 }
 
 function closeMemoryViewer(){
@@ -366,6 +427,11 @@ function closeMemoryViewer(){
     document
         .getElementById("memoryViewer")
         .classList.add("hidden");
+
+    if(nextPage !== ""){
+
+        location.href = nextPage;
+    }
 }
 
 function startFog(){
@@ -423,13 +489,49 @@ window.onload = function(){
 
     }
 
+    startFog();
 }
 
-window.onload = function(){
+function createSmoke(){
 
-    localStorage.clear();
+    const container =
+        document.getElementById("smoke-container");
 
+    for(let i=0;i<40;i++){
+
+        const smoke =
+            document.createElement("div");
+
+        smoke.className = "smoke";
+
+        smoke.style.left =
+            (window.innerWidth / 2 - 60)
+            + (Math.random() * 120 - 60)
+            + "px";
+
+        smoke.style.top =
+            (window.innerHeight / 2 - 60)
+            + (Math.random() * 120 - 60)
+            + "px";
+
+        smoke.style.setProperty(
+            "--dx",
+            (Math.random() * 600 - 300) + "px"
+        );
+
+        smoke.style.setProperty(
+            "--dy",
+            (Math.random() * 400 - 200) + "px"
+        );
+
+        container.appendChild(smoke);
+
+        setTimeout(()=>{
+            smoke.remove();
+        },4000);
+    }
 }
+
 
 function check(){
 
@@ -452,12 +554,7 @@ function check(){
             .innerHTML =
             "1正解";
 
-        setTimeout(()=>{
-
-            location.href =
-            "step3.html";
-
-        },1000);
+        return;
 
     }
 
@@ -474,12 +571,7 @@ function check(){
             .innerHTML =
             "2正解";
 
-        setTimeout(()=>{
-
-            location.href =
-            "step3.html";
-
-        },1000);
+        return;
 
     }
 
@@ -495,13 +587,8 @@ function check(){
             .getElementById("result")
             .innerHTML =
             "3正解";
-
-        setTimeout(()=>{
-
-            location.href =
-            "step3.html";
-
-        },1000);
+    
+        return;
 
     }
 
@@ -518,12 +605,7 @@ function check(){
             .innerHTML =
             "4正解";
 
-        setTimeout(()=>{
-
-            location.href =
-            "step3.html";
-
-        },1000);
+        return;
 
     }
 
@@ -535,7 +617,7 @@ function check(){
         ans === "クラブ"
     ){
 
-        unlockMemory(1);
+        unlockMemory(2);
 
         nextPage = "step3a.html";
 
@@ -574,8 +656,6 @@ function check(){
     }
 
 }
-
-
 
 
 </script>
