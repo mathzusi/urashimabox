@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<script src="common.js"></script>
+
+<title>STEP3</title>
+
+<style>
+
+/* =========================
+   マップ
+========================= */
+
+#selectedSymbols{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    min-height:55px;
+
+    margin:10px auto 0;
+
+}
+
+
+/* 選択した記号 */
+
+.selectedSymbol{
+
+    width:45px;
+
+    height:45px;
+
+    border-radius:50%;
+
+    background:white;
+
+    color:#003344;
+
+    border:3px solid #003344;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+/* マップ全体 */
+
+#mapArea{
+
+    position:relative;
+
+    width:650px;
+
+    max-width:95%;
+
+    margin:20px auto;
+
+}
+
+
+/* マップ画像 */
+
+#mapImage{
+
+    display:block;
+
+    width:100%;
+
+    height:auto;
+
+}
+
+
+/* =========================
+   部屋ボタン
+========================= */
+
+.roomButton{
+
+    position:absolute;
+
+    padding:0;
+
+    margin:0;
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    transition:0.15s;
+
+    z-index:2;
+
+}
+
+/* 選択順の丸数字 */
+.selectionNumber{
+    position:absolute;
+    top:0;
+    right:0;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:rgb(252, 252, 252);
+    color:#5c5c5c;
+    font-size:22px;
+    font-weight:bold;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    pointer-events:none;
+    z-index:20;
+}
+
+
+/* ボタン画像 */
+
+.roomButton img{
+
+    display:block;
+
+    width:100%;
+
+    height:100%;
+
+}
+
+
+/* マウスを乗せたとき */
+
+.roomButton:hover{
+
+    filter:brightness(0.92);
+
+}
+
+
+/* 押している瞬間 */
+
+.roomButton:active{
+
+    transform:scale(0.97);
+
+}
+
+/* -------------------------
+   部屋のクリック範囲
+------------------------- */
+
+
+/* 左・深海の間 */
+
+.room1{
+
+    left:5.1%;
+
+    top:2.5%;
+
+    width:21.4%;
+
+    height:94%;
+
+}
+
+
+/* 中央上・○ */
+
+.room2{
+
+    left:29%;
+
+    top:2.5%;
+
+    width:21.4%;
+
+    height:29%;
+
+}
+
+
+/* 中央下・△ */
+
+.room3{
+
+    left:29%;
+
+    top:35%;
+
+    width:21.4%;
+
+    height:29%;
+
+}
+
+
+/* 右上・六角形 */
+
+.room4{
+
+    left:76.8%;
+
+    top:2.5%;
+
+    width:21.4%;
+
+    height:29%;
+
+}
+
+
+/* 右中央・★ */
+
+.room5{
+
+    left:76.8%;
+
+    top:35.2%;
+
+    width:21.4%;
+
+    height:29%;
+
+}
+
+
+/* 右下・□ */
+
+.room6{
+
+    left:76.8%;
+
+    top:67.5%;
+
+    width:21.4%;
+
+    height:29%;
+
+}
+
+
+#mapResult{
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    min-height:30px;
+
+    margin:5px auto 20px;
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="fogLeft"></div>
+<div id="fogRight"></div>
+
+<div id="smoke-container"></div>
+
+<div id="memoryPanel"></div>
+
+<div id="ground"></div>
+
+<img
+    src="ryuuguujyou.png"
+    id="ryugujo"
+    alt="竜宮城">
+
+<h1>STEP3</h1>
+
+<!-- 記憶ポップアップ -->
+
+<div id="memoryViewer" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2 id="viewerTitle"></h2>
+
+        <p id="viewerText"></p>
+
+        <img
+            id="viewerImage"
+            class="hidden"
+            src=""
+            style="
+                max-width:250px;
+                margin-top:15px;
+                border-radius:10px;
+            ">
+
+        <button onclick="closeMemoryViewer()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<div id="story">
+
+    「ウラシマは前に竜宮城に来た時のことを覚えていますか？」<br>
+    「あんまり覚えてないな...」<br>
+    「では、海の生き物達に聞きにいきましょう！」<br>
+    「ただし、タコの言うことだけは信用してはいけませんよ」
+
+</div>
+
+<br><br>
+
+<h2>
+    まずはア〜エの答えを導き、海の生き物たちの話を頼りに、<br>
+    ウラシマが竜宮城を周った順番を特定しよう<br>
+</h2>
+
+<h2><br>
+
+    覚えていること：<br>
+    ・全部で５つの部屋を周った<br>
+    ・同じ部屋には行っていない<br>
+    ・玉手箱は最後の部屋で貰った
+
+</h2>
+
+<h2><br>
+    乙姫との約束：
+<br>
+    「タコの発言は信用しないこと」
+</h2>
+
+<br>
+
+
+<h2>海の生き物たちから話を聞こう</h2>
+
+<div class="creatureRow">
+
+    <img src="hirame.png" onclick="talk(1)">
+    <img src="karei.png" onclick="talk(2)">
+    <img src="ika.png" onclick="talk(3)">
+    <img src="tako.png" onclick="talk(4)">
+    <img src="kurage.png" onclick="talk(5)">
+
+</div>
+
+<div class="creatureRow">
+
+    <img src="manta.png" onclick="talk(6)">
+    <img src="sanma.png" onclick="talk(7)">
+    <img src="kame.png" onclick="talk(8)">
+    <img src="umiusi.png" onclick="talk(9)">
+
+</div>
+
+<div id="speechBox">
+
+    「……」
+
+</div><br>
+
+<h2>部屋を周った順に部屋を選択しよう</h2>
+
+<div id="mapArea">
+
+    <img src="map.png" id="mapImage">
+
+    <!-- 6つの部屋 -->
+
+    <button class="roomButton room1"
+    onclick="selectRoom(1)">
+    <img src="room1.png">
+</button>
+
+<button class="roomButton room2"
+    onclick="selectRoom(2)">
+    <img src="room2.png">
+</button>
+
+<button class="roomButton room3"
+    onclick="selectRoom(3)">
+    <img src="room3.png">
+</button>
+
+<button class="roomButton room4"
+    onclick="selectRoom(4)">
+    <img src="room4.png">
+</button>
+
+<button class="roomButton room5"
+    onclick="selectRoom(5)">
+    <img src="room5.png">
+</button>
+
+<button class="roomButton room6"
+    onclick="selectRoom(6)">
+    <img src="room6.png">
+</button>
+
+</div>
+
+<!-- 選択した順番と判定結果 -->
+
+<div id="selectedSymbols"></div>
+
+<p id="mapResult"></p>
+
+
+<button onclick="checkRoomOrder()" id="answerButton">
+    解答
+</button>
+
+<script>
+    
+
+    
+const talks={
+
+1:"カレイ「」",
+
+2:"ヒラメ「俺は東側の部屋には行っていないぜ」",
+
+3:"イカ",
+
+4:"タコ",
+
+5:"クラゲ",
+
+6:"マンタ",
+
+7:"サンマ",
+
+8:"カメ",
+
+9:"ウミウシ",
+
+};
+
+function talk(number){
+
+    document.getElementById("speechBox").textContent =
+        talks[number];
+}
+
+/* =========================
+   マップの部屋選択
+========================= */
+
+
+/*
+   各部屋の記号
+
+   あとから自由に変更できます。
+*/
+
+const roomSymbols = {
+
+    1:"深",
+
+    2:"○",
+
+    3:"△",
+
+    4:"六",
+
+    5:"★",
+
+    6:"□"
+
+};
+
+
+/*
+   正解の順番
+
+   ここだけ変更すれば
+   正解ルートを変更できます。
+
+   例：
+   2 → 5 → 4 → 6 → 3
+
+*/
+
+const correctOrder = [6, 5, 3, 2, 4];
+
+
+let selectedRooms = [];
+
+let checkingRooms = false;
+
+
+function selectRoom(roomNumber){
+
+    /*
+       判定中なら何もしない
+    */
+
+    if(checkingRooms){
+
+        return;
+
+    }
+
+
+    /*
+       すでに選択した部屋なら
+       何もしない
+    */
+
+    if(selectedRooms.includes(roomNumber)){
+
+        return;
+
+    }
+
+
+    /*
+       5つ選択済みなら
+       それ以上押せない
+    */
+
+    if(selectedRooms.length >= 5){
+
+        return;
+
+    }
+
+
+    /*
+       選択した部屋を記録
+    */
+
+    selectedRooms.push(roomNumber);
+
+
+    /*
+       選択した順番の丸数字を作る
+    */
+
+    const number =
+        document.createElement("div");
+
+    number.className =
+        "selectionNumber";
+
+    number.textContent =
+        selectedRooms.length;
+
+
+    /*
+       押した部屋のボタンを取得
+    */
+
+    const roomButton =
+        document.querySelector(
+            ".room" + roomNumber
+        );
+
+
+    /*
+       丸数字を部屋ボタンの上に表示
+    */
+
+    roomButton.appendChild(number);
+
+
+    /*
+      5つ選択したら
+      それ以上選べないようにする
+    */
+
+    if(selectedRooms.length === 5){
+
+    checkingRooms = true;
+
+    }
+
+}
+
+function checkRoomOrder(){
+
+    /*
+       5つ選んでいない場合は
+       解答できない
+    */
+
+    if(selectedRooms.length !== 5){
+
+        document
+            .getElementById("mapResult")
+            .textContent =
+            "5つの部屋を選んでください";
+
+        return;
+
+    }
+
+
+    const isCorrect =
+        selectedRooms.every(
+            (room,index) =>
+            room === correctOrder[index]
+        );
+
+
+    if(isCorrect){
+
+        document
+            .getElementById("mapResult")
+            .textContent =
+            "正解！";
+
+
+        setTimeout(()=>{
+
+            location.href =
+                "step4a.html";
+
+        },1000);
+
+
+    }else{
+
+        document
+            .getElementById("mapResult")
+            .textContent =
+            "不正解";
+
+
+        setTimeout(()=>{
+
+            resetRooms();
+
+        },1000);
+
+    }
+
+}
+
+function resetRooms(){
+
+    selectedRooms = [];
+
+    checkingRooms = false;
+
+
+    /*
+       マップ上の丸数字をすべて削除
+    */
+
+    document
+        .querySelectorAll(".selectionNumber")
+        .forEach(number => number.remove());
+
+
+    document
+        .getElementById("selectedSymbols")
+        .innerHTML = "";
+
+
+    document
+        .getElementById("mapResult")
+        .textContent = "";
+
+}
+
+</script>
+
+</body>
+</html>

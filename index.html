@@ -3,309 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 
 <title>浦島太郎</title>
 
-<style>
-body{
-    font-family:sans-serif;
-    text-align:center;
-    background:#44b9c9;
-    margin:0;
-    padding:60px 40px 300px 40px;
-    transition:1s;
-}
-
-#ryugujo{
-
-    position:fixed;
-
-    left:20px;
-
-    bottom:5vh;
-
-    width:200px;
-
-    height:auto;
-
-    z-index:10;
-
-    pointer-events:none;
-}
-
-#ground{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:10vh;
-    background:#d3c8b2;
-    z-index:8;
-}
-
-h1{
-    color:white;
-}
-
-h2{
-    color:white;
-}
-
-#result{
-    color:white;
-}
-
-#story,
-#stepStory{
-
-    max-width:700px;
-
-    margin:auto;
-
-    line-height:1.8;
-
-    color:white;
-
-    border:2px solid white;
-
-    border-radius:15px;
-
-    padding:25px;
-
-    background:rgba(255,255,255,0.05);
-}
-
-button{
-    font-size:18px;
-    padding:10px 20px;
-}
-
-.answerButton{
-    font-size:18px;
-    padding:10px 20px;
-    cursor:pointer;
-}
-
-input{
-    font-size:20px;
-    padding:10px;
-    width:300px;
-    box-sizing:border-box;
-}
-
-.hidden{
-    display:none;
-}
-
-.old{
-    background:#c0c0c0;
-    color:white;
-}
-
-
-.hidden{
-    display:none;
-}
-
-#memoryPanel{
-
-    display:flex;
-
-    gap:10px;
-}
-
-
-#boxButton{
-
-    margin-top:50px;
-
-    background:#2b2b2b;
-
-    color:#ff61a0;
-
-    border:2px solid #fdfdfd;
-
-    border-radius:12px;
-
-    padding:12px 30px;
-
-    font-size:22px;
-
-    cursor:pointer;
-}
-
-.memoryButton{
-
-    margin:0;
-
-    padding:8px 15px;
-
-    border:none;
-
-    border-radius:8px;
-
-    background:white;
-
-    color:#003344;
-
-    font-weight:bold;
-
-    cursor:pointer;
-}
-
-.modalContent h2{
-    color:black;
-}
-
-.modal{
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(0,0,0,0.7);
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    z-index:2000;
-}
-
-.modalContent{
-
-    background:white;
-
-    color:black;
-
-    padding:30px;
-
-    border-radius:15px;
-
-    max-width:500px;
-
-    width:80%;
-}
-
-.hidden{
-    display:none;
-}
-
-#fogLeft,
-#fogRight{
-
-    position:fixed;
-
-    bottom:0;
-
-    width:250px;
-
-    height:100vh;
-
-    pointer-events:none;
-
-    display:none;
-
-    z-index:5;
-}
-
-#fogLeft{
-    left:0;
-}
-
-#fogRight{
-    right:0;
-}
-
-.fog{
-
-    position:absolute;
-
-    bottom:-100px;
-
-    width:180px;
-
-    height:180px;
-
-    border-radius:50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,255,255,0.6) 0%,
-            rgba(255,255,255,0.3) 60%,
-            rgba(255,255,255,0) 100%
-        );
-
-    animation:fogRise 10s linear forwards;
-}
-
-@keyframes fogRise{
-
-    from{
-        transform:translateY(0) scale(0.6);
-        opacity:0;
-    }
-
-    20%{
-        opacity:0.8;
-    }
-
-    to{
-        transform:translateY(-800px) scale(2);
-        opacity:0;
-    }
-}
-
-#smoke-container{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    overflow:hidden;
-    z-index:9999;
-}
-
-.smoke{
-    position:absolute;
-    width:120px;
-    height:120px;
-    border-radius:50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,255,255,0.95) 0%,
-            rgba(255,255,255,0.7) 50%,
-            rgba(255,255,255,0) 100%
-        );
-
-    animation:puff 4s ease-out forwards;
-}
-
-
-@keyframes puff{
-
-    0%{
-        transform:translate(0,0) scale(0.2);
-        opacity:0;
-    }
-
-    20%{
-        opacity:1;
-    }
-
-    100%{
-        transform:
-            translate(var(--dx), var(--dy))
-            scale(4);
-        opacity:0;
-    }
-}
-</style>
 </head>
-
 
 <body>
 
@@ -393,7 +95,7 @@ input{
 
     </div>
 
-    <h2>まずはA〜Dを解き、Eの答えを導いてください。</h2><br>
+    <h2>まずはA〜Dを解き、Eの答えを導こう。</h2><br>
 
     <h2>
         乙姫との約束：
@@ -404,7 +106,7 @@ input{
     <input id="answer">
 
     <button class="answerButton" onclick="check()">
-        回答
+        解答
     </button>
 
     <p id="result"></p>
@@ -560,9 +262,9 @@ function check(){
         ans === "誠実"
     ){
 
-        unlockMemory(1);
-
         nextPage = "step2a.html";
+
+        unlockMemory(1);
 
         return;
     }
@@ -602,7 +304,7 @@ const memories = {
 
     2: {
         title: "記憶②",
-        text: "乙姫は何かを隠している。"
+        text: "竜宮城には深海の間がある。"
     },
 
     3: {
@@ -672,6 +374,8 @@ function unlockMemory(number){
             "memory"+number
         ) === "true"
     ){
+
+        showMemory(number);
         return;
     }
 
@@ -681,8 +385,8 @@ function unlockMemory(number){
     );
 
     createMemoryButton(number);
-    
-    showMemory(number, true);
+
+    showMemory(number,true);
 }
 
 function closeMemoryViewer(){
@@ -754,7 +458,12 @@ window.onload = function(){
 
 }
 
+
 </script>
+
+<button onclick="localStorage.clear();location.reload();">
+記憶リセット
+</button>
 
 </body>
 </html>
