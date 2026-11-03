@@ -388,3 +388,8 @@ input{
     flex-shrink:0;
 }
 
+
+
+#viewerText{
+    white-space:pre-line;
+}
