@@ -368,7 +368,7 @@
     <p>
     「約束を破ったのですか！？次からは破らないでくださいね。」<br>
     オトヒメは怒っている。<br>
-    「次の暗号では、前に竜宮城に来た時のことをウラシマは覚えていますか？」<br>
+    「次の暗号では、前に竜宮城に来た時の記憶が必要です。ウラシマは覚えていますか？」<br>
     「あんまり覚えてないな...。」<br>
     「では、海の生き物達に聞きにいきましょう！」<br>
     「ただし、タコの言うことは信用してはいけません。」
@@ -385,20 +385,27 @@
 
 <h2>
     海の生き物たちの話を頼りに、<br>
-    ウラシマが竜宮城を周った順番を特定しよう。<br>
+    ウラシマが竜宮城を周った順番と<br>
+    玉手箱を貰った部屋を特定しよう。<br>
 </h2>
 
-<h2><br>
-
-    覚えていること：<br>
-    ・全部で５つの部屋を周った。<br>
-    ・玉手箱を貰った部屋以外では、1つの部屋につき1つの遊びが開催され、そこに行って遊んだ。<br>
-    ・玉手箱を貰った部屋にだけオトヒメがいた。<br>
-    ・遊びはその部屋にいる全員が参加する。<br>
-    ・遊んだ順番は、けまり、羽根つき、かくれんぼ、双六。<br>
-    ・その日居た海の生き物は以下の7匹。
-
+<h2>
+    <br>覚えていること
 </h2>
+
+<div id="remembered">
+
+    <p>
+        ・全部で５つの部屋を周った。<br>
+        ・玉手箱を貰った部屋以外では、1つの部屋につき1つの遊びが開催され、そこに行って遊んだ。<br>
+        ・玉手箱を貰った部屋にだけオトヒメがいた。<br>
+        ・遊びはその部屋にいる全員が参加する。<br>
+        ・遊んだ順番は、けまり、羽根つき、かくれんぼ、双六。<br>
+        ・その日居た海の生き物は以下の7匹。
+        ※海の生き物達はウラシマも1匹として数えている。
+    </p>
+
+</div>
 
 <h2><br>
     オトヒメとの約束：
@@ -550,8 +557,13 @@ function talk(number){
 
 */
 
-const correctOrder = [4, 6, 2, 3, 5];
+// 正解パターンA
+const correctOrderA = [4, 6, 2, 3, 5];
+const correctGiftRoomA = 5;
 
+// 正解パターンB
+const correctOrderB = [1, 2, 3, 4, 6];
+const correctGiftRoomB = 3;
 
 let selectedRooms = [];
 
@@ -648,99 +660,76 @@ function selectRoom(roomNumber){
 
 function checkRoomOrder(){
 
-    /*
-       5つ選んでいない場合
-    */
-
+    // 5つ選んでいない場合
     if(selectedRooms.length !== 5){
 
-        document
-            .getElementById("mapResult")
-            .textContent =
+        document.getElementById("mapResult").textContent =
             "5つの部屋を選んでください";
 
         return;
-
     }
 
+    // 玉手箱を貰った部屋の選択を取得
+    const giftRoom = document.querySelector(
+        'input[name="giftRoom"]:checked'
+    );
 
-    /*
-       玉手箱を貰った部屋の選択を取得
-    */
-
-    const giftRoom =
-        document.querySelector(
-            'input[name="giftRoom"]:checked'
-        );
-
-
-    /*
-       部屋を選択していない場合
-    */
-
+    // 部屋を選択していない場合
     if(!giftRoom){
 
-        document
-            .getElementById("mapResult")
-            .textContent =
+        document.getElementById("mapResult").textContent =
             "玉手箱を貰った部屋を選択してください";
 
         return;
+    }
+
+    // パターンAの判定
+    const isPatternA =
+        selectedRooms.every((room, index) =>
+            room === correctOrderA[index]
+        ) &&
+        Number(giftRoom.value) === correctGiftRoomA;
+
+    // パターンBの判定
+    const isPatternB =
+        selectedRooms.every((room, index) =>
+            room === correctOrderB[index]
+        ) &&
+        Number(giftRoom.value) === correctGiftRoomB;
+
+    // 正解パターンA
+    if(isPatternA){
+
+        document.getElementById("mapResult").textContent =
+            "正解！";
+
+        setTimeout(() => {
+            location.href = "step4a.html";
+        }, 1000);
 
     }
 
+    // 正解パターンB
+    else if(isPatternB){
 
-    /*
-       地図の順番が正しいか判定
-    */
-
-    const isOrderCorrect =
-        selectedRooms.every(
-            (room,index) =>
-            room === correctOrder[index]
-        );
-
-
-    /*
-       玉手箱を貰った部屋が正しいか判定
-    */
-
-    const correctGiftRoom = 5;
-
-    const isGiftRoomCorrect =
-        Number(giftRoom.value) === correctGiftRoom;
-
-
-    /*
-       両方正解ならクリア
-    */
-
-    if(isOrderCorrect && isGiftRoomCorrect){
-
-        document
-            .getElementById("mapResult")
-            .textContent =
+        document.getElementById("mapResult").textContent =
             "正解！";
 
-        setTimeout(()=>{
+        setTimeout(() => {
+            location.href = "step4b.html";
+        }, 1000);
 
-            location.href =
-                "step4a.html";
+    }
 
-        },1000);
+    // どちらでもない場合
+    else{
 
-    }else{
-
-        document
-            .getElementById("mapResult")
-            .textContent =
+        document.getElementById("mapResult").textContent =
             "不正解";
 
-        setTimeout(()=>{
-
+        setTimeout(() => {
             resetRooms();
-
-        },1000);
+        }, 1000);
 
     }
 

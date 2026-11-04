@@ -393,3 +393,20 @@ input{
 #viewerText{
     white-space:pre-line;
 }
+
+#remembered {
+    width: fit-content;
+    max-width: 95%;
+    margin: 0 auto;
+    text-align: left;
+}
+
+#remembered h2 {
+    text-align: left;
+}
+
+#remembered p {
+    text-align: left;
+    line-height: 1.8;
+    color: white;
+}

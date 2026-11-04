@@ -6,17 +6,17 @@ const memories = {
 
     1:{
         title:"記憶①",
-        text:"あなたは釣竿を持っていた。"
+        text:"あなたは釣竿を持っていた。\n この記憶を持っている時は、5の謎に釣竿のイラストを描こう。"
     },
 
     2:{
         title:"記憶②",
-        text:"竜宮城には深海の間がある。"
+        text:"竜宮城には深海の部屋がある。"
     },
 
     3:{
         title:"記憶③",
-        text:"失われた記憶が戻り始めている。"
+        text:"竜宮城で行われる祭りは珊瑚祭りである。"
     }
 
 };
@@ -57,23 +57,27 @@ function showMemory(number,isNew=false){
         .textContent =
         memories[number].text;
 
-    const img =
-        document.getElementById("viewerImage");
+    const img = document.getElementById("viewerImage");
 
-    if(img){
+if(img){
 
-        if(number===1){
+    if(number === 1){
 
-            img.src="turizao.png";
-            img.classList.remove("hidden");
+        img.src = "turizao.png";
+        img.classList.remove("hidden");
 
-        }else{
+    }else if(number === 2){
 
-            img.classList.add("hidden");
+        img.src = "tizu.png";
+        img.classList.remove("hidden");
 
-        }
+    }else{
+
+        img.classList.add("hidden");
 
     }
+
+}
     
 
     document
@@ -254,3 +258,13 @@ window.addEventListener("load",function(){
     startFog();
 
 });
+
+// ページの分岐履歴を保存する
+function saveRoute(step, route) {
+    localStorage.setItem("route" + step, route);
+}
+
+// ページの分岐履歴を取得する
+function getRoute(step) {
+    return localStorage.getItem("route" + step);
+}

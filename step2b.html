@@ -168,13 +168,28 @@ function check(){
 
     }
 
-    // E1
     if(
         ans === "こぶら"||
         ans === "コブラ"||
+        ans === "らいん"||
+        ans === "ライン"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "不正解　現在記憶①は忘れています";
+
+        return;
+
+    }
+
+    // E1
+    if(
         ans === "くらぶ"||
         ans === "クラブ"
     ){
+        saveRoute(2, "A");
 
         unlockMemory(2);
 
@@ -185,12 +200,11 @@ function check(){
 
     // E2
     if(
-        ans === "らいん"||
-        ans === "ライン"||
         ans === "たんい"||
         ans === "タンイ"||
         ans === "単位"
     ){
+        saveRoute(2, "B");
 
         createSmoke();
 

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
+<script src="common.js"></script>
 
 <title>浦島太郎</title>
 
@@ -131,8 +132,6 @@
 
 
 <script>
-
-let nextPage = "";
 
 function openBox(){
 
@@ -277,6 +276,7 @@ function check(){
         ans === "セイジツ"||
         ans === "誠実"
     ){
+        saveRoute(1, "A");
 
         nextPage = "step2a.html";
 
@@ -290,7 +290,8 @@ function check(){
         ans === "くろう"||
         ans === "クロウ"||
         ans === "苦労"
-    ){
+    ){        
+        saveRoute(2, "B");
 
         createSmoke();
 
@@ -308,170 +309,6 @@ function check(){
         .getElementById("result")
         .innerHTML =
         "不正解";
-}
-
-
-const memories = {
-
-    1: {
-        title: "記憶①",
-        text: "あなたは釣竿を持っていた。\n この記憶を持っている時は、5の謎に釣竿のイラストを描こう。"
-    },
-
-    2: {
-        title: "記憶②",
-        text: "竜宮城には深海の間がある。"
-    },
-
-    3: {
-        title: "記憶③",
-        text: "失われた記憶が戻り始めている。"
-    }
-
-};
-
-function createMemoryButton(number){
-
-    const button =
-        document.createElement("button");
-
-    button.className =
-        "memoryButton";
-
-    button.textContent =
-        memories[number].title;
-
-    button.onclick = () => {
-    showMemory(number);
-};
-
-    document
-        .getElementById("memoryPanel")
-        .appendChild(button);
-}
-
-function showMemory(number, isNew = false){
-
-    document
-        .getElementById("viewerTitle")
-        .textContent =
-        isNew
-        ? memories[number].title + "を手に入れた。"
-        : memories[number].title;
-
-    document
-        .getElementById("viewerText")
-        .textContent =
-        memories[number].text;
-
-    const img =
-        document.getElementById("viewerImage");
-
-    if(number === 1){
-
-        img.src = "turizao.png";
-        img.classList.remove("hidden");
-
-    }else{
-
-        img.classList.add("hidden");
-
-    }
-
-    document
-        .getElementById("memoryViewer")
-        .classList.remove("hidden");
-}
-
-function unlockMemory(number){
-
-    if(
-        localStorage.getItem(
-            "memory"+number
-        ) === "true"
-    ){
-
-        showMemory(number);
-        return;
-    }
-
-    localStorage.setItem(
-        "memory"+number,
-        "true"
-    );
-
-    createMemoryButton(number);
-
-    showMemory(number,true);
-}
-
-function closeMemoryViewer(){
-
-    document
-        .getElementById("memoryViewer")
-        .classList.add("hidden");
-
-    if(nextPage !== ""){
-
-        location.href = nextPage;
-    }
-}
-
-function startFog(){
-
-    document
-        .getElementById("fogLeft")
-        .style.display = "block";
-
-    document
-        .getElementById("fogRight")
-        .style.display = "block";
-
-    setInterval(()=>{
-
-        createFog("fogLeft");
-
-        createFog("fogRight");
-
-    },1000);
-}
-
-function createFog(id){
-
-    const area =
-        document.getElementById(id);
-
-    const fog =
-        document.createElement("div");
-
-    fog.className = "fog";
-
-    fog.style.left =
-        Math.random()*100 + "px";
-
-    area.appendChild(fog);
-
-    setTimeout(()=>{
-        fog.remove();
-    },10000);
-}
-
-window.onload = function(){
-
-    for(let i=1;i<=3;i++){
-
-        if(
-            localStorage.getItem(
-                "memory"+i
-            ) === "true"
-        ){
-
-            createMemoryButton(i);
-
-        }
-
-    }
-
 }
 
 

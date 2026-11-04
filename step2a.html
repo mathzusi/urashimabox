@@ -168,13 +168,29 @@ function check(){
 
     }
 
+    if(
+        ans === "くらぶ"||
+        ans === "クラブ"||
+        ans === "たんい"||
+        ans === "タンイ"||
+        ans === "単位"
+    ){
+
+        document
+            .getElementById("result")
+            .innerHTML =
+            "不正解　記憶①を確認しましょう";
+
+        return;
+
+    }
+
     // E1
     if(
         ans === "こぶら"||
-        ans === "コブラ"||
-        ans === "くらぶ"||
-        ans === "クラブ"
+        ans === "コブラ"
     ){
+        saveRoute(2, "A");
 
         unlockMemory(2);
 
@@ -186,11 +202,9 @@ function check(){
     // E2
     if(
         ans === "らいん"||
-        ans === "ライン"||
-        ans === "たんい"||
-        ans === "タンイ"||
-        ans === "単位"
+        ans === "ライン"
     ){
+        saveRoute(2, "B");
 
         createSmoke();
 
