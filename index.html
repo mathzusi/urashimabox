@@ -86,7 +86,7 @@
         「...なんでまたここに来たんだろう？」<br>
         思わずつぶやいた時、声が僕の後ろからした。<br>
         「箱を開けてしまったのですか！？開けてはいけないと言ったでしょう！」<br>
-        後ろを向くと、怒った顔の乙姫が居た。<br>
+        後ろを向くと、怒った顔のオトヒメが居た。<br>
        「あなたが開けた箱に入っていた煙は人間を急速に老けさせてしまう煙...。ここに長くいると死んでしまいますわ！」<br>
         「えっ！？じゃあなんでそんな危険な箱を僕に...」<br>
         「今はそんなことを気にしている場合じゃありません！ええっと、どこだったかしら...。」<br>
@@ -134,6 +134,14 @@
 <script>
 
 function openBox(){
+
+    const button = document.getElementById("boxButton");
+
+    if(button.disabled) return;
+
+    button.disabled = true;
+
+    createSmoke();
 
     createSmoke();
 
