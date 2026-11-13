@@ -132,9 +132,7 @@ function startFog(){
 
     const page = location.pathname.split("/").pop();
 
-    if(page.endsWith("a.html")){
-        return;
-    }
+    if(page === "index.html" || page === "" || page.endsWith("a.html")) return;
 
     const left =
         document.getElementById("fogLeft");
