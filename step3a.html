@@ -730,6 +730,7 @@ function checkRoomOrder(){
 
         setTimeout(() => {
             location.href = "step4a.html";
+            unlockMemory(3);
         }, 1000);
 
     }
@@ -795,6 +796,18 @@ function resetRooms(){
         .getElementById("mapResult")
         .textContent = "";
 
+}
+
+const route1 = getRoute(1);
+const route2 = getRoute(2);
+const route3 = getRoute(3);
+
+const route = route1 + route2 + route3;
+
+const puzzle = document.getElementById("puzzle" + route);
+
+if (puzzle) {
+    puzzle.classList.remove("hidden");
 }
 
 </script>

@@ -353,7 +353,7 @@ input{
 
 
 .hidden{
-    display:none;
+    display:none !important;
 }
 
 /* =========================
@@ -409,4 +409,451 @@ input{
     text-align: left;
     line-height: 1.8;
     color: white;
+}
+
+#puzzleAAA img,
+#puzzleABA img,
+#puzzleBAA img,
+#puzzleBBA img {
+    max-width: 90%;
+    width: 600px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* 解答用紙 */
+#answerPaper {
+    width: 220px;
+    min-height: 130px;
+    margin: 0;
+    padding: 20px;
+    background: #fffdf1;
+    border: 1px solid #d9cba5;
+    box-shadow: 3px 5px 12px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+    text-align: center;
+    transform: rotate(-2deg);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+#answerPaper.paperVisible {
+    opacity: 1;
+}
+
+/* 紙に書かれる答え */
+#writtenAnswer {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 15px;
+    min-height: 40px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* 文字が書かれるアニメーション */
+.writing {
+    animation: writeIn 1.2s ease-out forwards;
+}
+
+@keyframes writeIn {
+    from {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+    }
+    to {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+
+/* =========================
+   スマホ表示の調整
+========================= */
+
+@media screen and (max-width: 600px) {
+
+    /* 竜宮城の画像 */
+    #ryugujo {
+        width: 80%;
+        max-width: 100px;
+        height: auto;
+    }
+
+    /* 大見出し */
+    h1 {
+        font-size: 26px;
+    }
+
+    /* 小見出し */
+    h2 {
+        font-size: 18px;
+    }
+
+    /* 通常の文章 */
+    p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    /* ボタン */
+    button {
+        font-size: 14px;
+        max-width: 90%;
+    }
+
+    /* 謎の画像 */
+    #puzzleAAA img,
+    #puzzleABA img,
+    #puzzleBAA img,
+    #puzzleBBA img {
+        width: 95%;
+        max-width: 100%;
+        height: auto;
+    }
+
+    
+
+}
+
+/* ウラシマの画像サイズ */
+img[src="urasima.png"] {
+    width: 200px;
+    max-width: 80%;
+    height: auto;
+}
+
+@media screen and (max-width: 600px) {
+    img[src="urasima.png"] {
+        width: 100px;
+        max-width: 60%;
+        height: auto;
+    }
+}
+
+img[src="tamatebako.png"] {
+    width: 80px;
+    max-width: 80%;
+    height: auto;
+}
+
+@media screen and (max-width: 600px) {
+    img[src="tamatebako.png"] {
+        width: 40px;
+        max-width: 30%;
+        height: auto;
+    }
+}
+
+/* 画像を横並びにする */
+.image-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 画像のサイズ */
+.image-row img {
+    width: 200px;
+    max-width: 45%;
+    height: auto;
+}
+
+@media screen and (max-width: 600px) {
+    .image-row {
+        gap: 10px;
+    }
+
+    .image-row img {
+        width: 150px;
+        max-width: 45%;
+    }
+}
+
+/* =========================
+   エンディングの暗転演出
+========================= */
+
+#endingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: black;
+    color: white;
+
+    z-index: 99999;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: opacity 0.8s ease;
+
+    box-sizing: border-box;
+    padding: 30px;
+
+    cursor: default;
+    overflow-y: auto;
+}
+
+/* 暗転開始 */
+
+#endingScreen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* =========================
+   ストーリーの文章
+========================= */
+
+#endingText {
+
+    display: none;
+
+    color: white;
+
+    font-size: 22px;
+
+    line-height: 1.6;
+
+    max-width: 700px;
+
+    width: 100%;
+
+    text-align: center;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+
+    max-height: 80vh;
+
+    overflow-y: auto;
+
+    opacity: 0;
+
+}
+
+/* ストーリーの表示開始 */
+
+#endingText.visible {
+
+    display: block;
+
+    animation: storyFadeIn 2s ease forwards;
+
+}
+
+/* 文章全体が浮かび上がる */
+
+@keyframes storyFadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+/* =========================
+   エンディングのスマホ表示
+========================= */
+
+@media screen and (max-width: 600px) {
+
+    #endingText {
+
+        font-size: 17px;
+
+        line-height: 1.6;
+
+    }
+
+    #endingScreen {
+
+        padding: 25px;
+
+    }
+
+}
+
+/* 書き置きを読むボタン */
+
+#endingNextButton {
+
+    margin-top: 30px;
+
+    padding: 12px 30px;
+
+    background: transparent;
+
+    color: white;
+
+    border: 1px solid white;
+
+    border-radius: 8px;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    flex-shrink: 0;
+
+}
+
+
+/* ボタンのフェードイン */
+
+#endingNextButton.buttonVisible {
+
+    animation: endingButtonFadeIn 1.5s ease forwards;
+
+}
+
+
+@keyframes endingButtonFadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+/* ボタンにカーソルを合わせたとき */
+
+#endingNextButton:hover {
+
+    background: rgba(255,255,255,0.15);
+
+}
+
+/* 書き置きへの切り替え演出 */
+
+#endingScreen.endingLeaving #answerPaper,
+#endingScreen.endingLeaving #endingText,
+#endingScreen.endingLeaving #endingNextButton {
+
+    animation: endingFadeOut 0.8s ease forwards;
+
+}
+
+@keyframes endingFadeOut {
+
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+
+}
+
+/* 時間差で表示されるストーリー */
+
+.additionalStory {
+
+    margin-top: 25px;
+
+    white-space: pre-wrap;
+
+    opacity: 0;
+
+    animation: storyFadeIn 2s ease forwards;
+
+}
+
+/* =========================
+   エンディングのめまい演出
+========================= */
+
+#endingScreen.dizzy {
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+}
+
+
+/* ストーリーとボタンを回転させる */
+
+#endingScreen.dizzy #endingText,
+#endingScreen.dizzy #endingNextButton {
+
+    animation: dizzyEffect 3s ease-in-out forwards;
+
+}
+
+
+/* めまいのアニメーション */
+
+@keyframes dizzyEffect {
+
+    0% {
+        transform: rotate(0deg) scale(1);
+        filter: blur(0px);
+        opacity: 1;
+    }
+
+    15% {
+        transform: rotate(-7deg) scale(1.05);
+        filter: blur(0.5px);
+        opacity: 1;
+    }
+
+    30% {
+        transform: rotate(12deg) scale(1.1);
+        filter: blur(1px);
+        opacity: 1;
+    }
+
+    45% {
+        transform: rotate(-20deg) scale(1.2);
+        filter: blur(2px);
+        opacity: 1;
+    }
+
+    65% {
+        transform: rotate(100deg) scale(1.4);
+        filter: blur(3px);
+        opacity: 0.9;
+    }
+
+    85% {
+        transform: rotate(300deg) scale(1.7);
+        filter: blur(7px);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: rotate(540deg) scale(2);
+        filter: blur(12px);
+        opacity: 0;
+    }
+
 }
