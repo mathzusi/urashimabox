@@ -52,6 +52,7 @@
 
 </div>
 
+
 <h1 id="title">STORY</h1>
 
 <div id="story">
@@ -129,6 +130,11 @@
     <p id="result"></p>
 
 </div>
+
+<button onclick="localStorage.clear();location.reload();">
+記憶リセット
+</button>
+
 
 
 <script>
@@ -211,6 +217,8 @@ function createSmoke(){
 
 function check(){
 
+    if(reviewMode) return;
+
     const ans =
         document
         .getElementById("answer")
@@ -284,6 +292,8 @@ function check(){
         ans === "セイジツ"||
         ans === "誠実"
     ){
+        saveStepRecord(1, ans);
+
         saveRoute(1, "A");
 
         nextPage = "step2a.html";
@@ -299,6 +309,8 @@ function check(){
         ans === "クロウ"||
         ans === "苦労"
     ){        
+        saveStepRecord(1, ans);
+
         saveRoute(2, "B");
 
         createSmoke();
@@ -318,6 +330,7 @@ function check(){
         .innerHTML =
         "不正解";
 }
+
 
 
 </script>

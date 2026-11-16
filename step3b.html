@@ -572,6 +572,8 @@ let checkingRooms = false;
 
 function selectRoom(roomNumber){
 
+    if(reviewMode && !restoringRecord) return;
+
     /*
        判定中なら何もしない
     */
@@ -659,6 +661,8 @@ function selectRoom(roomNumber){
 }
 
 function checkRoomOrder(){
+
+    if(reviewMode) return;
 
     // 5つ選んでいない場合
     if(selectedRooms.length !== 5){

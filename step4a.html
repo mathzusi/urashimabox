@@ -136,18 +136,20 @@
 
 const puzzleAnswers = {
     AAA: ["いけん","イケン", "意見"],
-    AAB: ["答え②", "こたえ②"],
-    ABA: ["答え③", "こたえ③"],
-    ABB: ["答え④", "こたえ④"],
+    AAB: ["しけん", "シケン", "試験", "私見"],
+    ABA: ["えいえん", "エイエン", "永遠"],
+    ABB: ["だえん", "ダエン", "楕円"],
     BAA: ["らいす", "ライス"],
-    BAB: ["答え⑥", "こたえ⑥"],
-    BBA: ["答え⑦", "こたえ⑦"],
-    BBB: ["答え⑧", "こたえ⑧"]
+    BAB: ["あいす", "アイス"],
+    BBA: ["えいぶん", "エイブン", "英文"],
+    BBB: ["だぶん", "ダブン", "駄文"]
 };
 
 let answered = false;
 
 function check(penColor){
+
+    if(reviewMode) return;
 
     if(answered) return;
 
@@ -159,9 +161,15 @@ function check(penColor){
 
     if(puzzleAnswers[route]?.includes(ans)){
 
-        answered = true;
+    answered = true;
 
-        result.textContent = "正解！";
+    saveStepRecord(4, ans, {
+
+        penColor: penColor
+
+    });
+
+    result.textContent = "正解！";
 
         if(penColor === "red"){
 

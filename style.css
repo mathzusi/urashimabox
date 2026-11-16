@@ -857,3 +857,993 @@ img[src="tamatebako.png"] {
     }
 
 }
+
+/* 前回の記録一覧 */
+
+#recordButtons {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+    margin-top: 20px;
+
+}
+
+
+/* 記録閲覧中の表示 */
+
+#reviewBar {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    background: #003344;
+
+    color: white;
+
+    padding: 12px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    z-index: 100000;
+
+    gap: 10px;
+
+    font-size: 14px;
+
+}
+
+#reviewBar button {
+
+    font-size: 14px;
+
+    padding: 8px 15px;
+
+    background: white;
+
+    color: #003344;
+
+    border: none;
+
+    border-radius: 6px;
+
+}
+
+/* =========================
+   前回の記録・分割表示
+========================= */
+
+
+/* 分割表示中のbody */
+
+body.recordSplitActive {
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    width: 100%;
+
+    height: 100dvh;
+
+}
+
+
+/* 分割画面全体 */
+
+#recordSplitLayout {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100dvh;
+
+    display: grid;
+
+    grid-template-columns:
+
+        minmax(0, var(--split-size, 50%))
+
+        8px
+
+        minmax(0, 1fr);
+
+    grid-template-rows: minmax(0, 1fr);
+
+    overflow: hidden;
+
+}
+
+
+/* =========================
+   現在のページの固定領域
+========================= */
+
+#currentPane {
+
+    position: relative;
+
+    min-width: 0;
+
+    min-height: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    background: inherit;
+
+    transform: translateZ(0);
+
+}
+
+
+/* =========================
+   スクロールする領域
+========================= */
+
+#currentScroll {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: auto;
+
+    box-sizing: border-box;
+
+    overscroll-behavior: contain;
+
+}
+
+
+/* 地面を分割画面の下部に固定 */
+
+#currentPane > #ground {
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 10%;
+
+    z-index: 8;
+
+}
+
+
+/* 竜宮城を分割画面の左下に固定 */
+
+#currentPane > #ryugujo {
+
+    position: absolute;
+
+    left: 20px;
+
+    bottom: 5%;
+
+    width: 200px;
+
+    height: auto;
+
+    z-index: 10;
+
+    pointer-events: none;
+
+}
+
+
+/* 現在のページ内の画像 */
+
+#currentPane img {
+
+    max-width: 100%;
+
+    height: auto;
+
+}
+
+
+/* 現在のページ内の入力欄 */
+
+#currentPane input:not([type="radio"]):not([type="checkbox"]) {
+
+    max-width: 100%;
+
+}
+
+
+/* 記憶ボタンが横にはみ出さないようにする */
+
+#currentPane #memoryPanel {
+
+    flex-wrap: wrap;
+
+}
+
+
+/* =========================
+   境界線
+========================= */
+
+#recordSplitDivider {
+
+    position: relative;
+
+    background: #66868c;
+
+    cursor: col-resize;
+
+    touch-action: none;
+
+    z-index: 100;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+
+/* 境界線の持ち手 */
+
+#recordSplitDivider span {
+
+    width: 4px;
+
+    height: 50px;
+
+    border-radius: 5px;
+
+    background: rgba(255,255,255,0.8);
+
+}
+
+
+/* ドラッグ中の境界線 */
+
+#recordSplitDivider:hover,
+
+#recordSplitLayout.dragging #recordSplitDivider {
+
+    background: #003344;
+
+}
+
+
+/* ドラッグ中にiframeが邪魔しないようにする */
+
+#recordSplitLayout.dragging iframe {
+
+    pointer-events: none;
+
+}
+
+
+#recordSplitLayout.dragging {
+
+    user-select: none;
+
+}
+
+
+/* =========================
+   前回の記録側
+========================= */
+
+#recordPane {
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    min-height: 0;
+
+    height: 100%;
+
+    background: #003344;
+
+    overflow: hidden;
+
+}
+
+
+/* 記録側のヘッダー */
+
+#recordPaneHeader {
+
+    background: #003344;
+
+    color: white;
+
+    padding: 12px;
+
+    box-sizing: border-box;
+
+    flex-shrink: 0;
+
+}
+
+
+/* タイトルと閉じるボタン */
+
+#recordPaneTitle {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+}
+
+
+/* 閉じるボタン */
+
+#closeRecordSplitButton {
+
+    background: transparent;
+
+    border: 1px solid white;
+
+    color: white;
+
+    border-radius: 6px;
+
+    padding: 6px 12px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+}
+
+
+/* STEP切り替えボタン */
+
+#recordStepButtons {
+
+    display: flex;
+
+    gap: 6px;
+
+    margin-top: 12px;
+
+}
+
+
+#recordStepButtons button {
+
+    flex: 1;
+
+    min-width: 0;
+
+    background: rgba(255,255,255,0.15);
+
+    color: white;
+
+    border: 1px solid rgba(255,255,255,0.4);
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
+    padding: 8px 3px;
+
+    cursor: pointer;
+
+}
+
+
+/* 選択中のSTEP */
+
+#recordStepButtons button.selected {
+
+    background: white;
+
+    color: #003344;
+
+    font-weight: bold;
+
+}
+
+
+/* 前回のページを表示するiframe */
+
+#recordFrame {
+
+    display: block;
+
+    width: 100%;
+
+    flex: 1;
+
+    min-height: 0;
+
+    border: none;
+
+    background: #44b9c9;
+
+}
+
+
+/* =========================
+   iframe内の記録ページ
+========================= */
+
+body.embeddedRecord {
+
+    padding: 30px 20px 150px 20px;
+
+    box-sizing: border-box;
+
+}
+
+/* =========================
+   スマートフォン：上下分割
+========================= */
+
+@media screen and (max-width: 760px) {
+
+    #recordSplitLayout {
+
+        grid-template-columns: minmax(0, 1fr);
+
+        grid-template-rows:
+
+            minmax(0, var(--split-size, 50%))
+
+            8px
+
+            minmax(0, 1fr);
+
+    }
+
+
+    /* 境界線を上下ドラッグに変更 */
+
+    #recordSplitDivider {
+
+        cursor: row-resize;
+
+    }
+
+
+    #recordSplitDivider span {
+
+        width: 50px;
+
+        height: 4px;
+
+    }
+
+
+    /* 記録側のヘッダーを小さくする */
+
+    #recordPaneHeader {
+
+        padding: 8px 12px;
+
+    }
+
+
+    #recordPaneTitle {
+
+        font-size: 14px;
+
+    }
+
+
+    #recordStepButtons {
+
+        margin-top: 8px;
+
+    }
+
+
+    #recordStepButtons button {
+
+        font-size: 12px;
+
+        padding: 6px 3px;
+
+    }
+
+
+    #closeRecordSplitButton {
+
+        font-size: 12px;
+
+        padding: 5px 10px;
+
+    }
+
+
+    body.embeddedRecord {
+
+        padding: 20px 15px 100px 15px;
+
+    }
+
+}
+
+/* スマートフォンでの竜宮城のサイズ */
+
+@media screen and (max-width: 760px) {
+
+    #currentPane > #ryugujo {
+
+        width: 120px;
+
+        left: 10px;
+
+    }
+
+}
+
+
+/* 記録側も狭い画面では同じサイズにする */
+
+@media screen and (max-width: 760px) {
+
+    body.embeddedRecord #ryugujo {
+
+        width: 120px;
+
+        left: 10px;
+
+    }
+
+}
+
+/* 前回の記録側の記憶ボタン */
+
+body.embeddedRecord #memoryPanel {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+}
+
+
+/* 前回の記録側の記憶ボタンのサイズ */
+
+body.embeddedRecord .memoryButton {
+
+    font-size: 14px;
+
+    padding: 8px 12px;
+
+}
+
+/* =========================
+   過去の周回の切り替え
+========================= */
+
+
+/* スマートフォン */
+
+@media screen and (max-width: 760px) {
+
+    #recordHistoryNavigation {
+
+        margin-top: 6px;
+
+        gap: 5px;
+
+    }
+
+
+    #recordHistoryNavigation button {
+
+        font-size: 11px;
+
+        padding: 5px 3px;
+
+    }
+
+}
+
+/* =========================
+   過去の周回の切り替え
+========================= */
+
+#recordHistoryNavigation {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-top: 10px;
+
+}
+
+
+#recordHistoryNavigation button {
+
+    flex: 1;
+
+    min-width: 0;
+
+    background: rgba(255,255,255,0.12);
+
+    color: white;
+
+    border: 1px solid rgba(255,255,255,0.4);
+
+    border-radius: 6px;
+
+    padding: 7px 5px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+}
+
+
+/* 操作できないボタン */
+
+#recordHistoryNavigation button:disabled {
+
+    opacity: 0.3;
+
+    cursor: default;
+
+}
+
+
+/* マウスを重ねたとき */
+
+#recordHistoryNavigation button:not(:disabled):hover {
+
+    background: rgba(255,255,255,0.25);
+
+}
+
+
+/* スマートフォン */
+
+@media screen and (max-width: 760px) {
+
+    #recordHistoryNavigation {
+
+        margin-top: 6px;
+
+        gap: 5px;
+
+    }
+
+
+    #recordHistoryNavigation button {
+
+        font-size: 11px;
+
+        padding: 5px 3px;
+
+    }
+
+}
+
+/* =========================
+   多重分割表示
+========================= */
+
+
+/* PCの場合は常に左右分割 */
+
+#recordSplitLayout.recordSplitDesktop {
+
+    grid-template-columns:
+
+        minmax(0, var(--split-size, 50%))
+
+        8px
+
+        minmax(0, 1fr);
+
+    grid-template-rows: minmax(0, 1fr);
+
+}
+
+
+/* スマートフォンの場合は常に上下分割 */
+
+#recordSplitLayout.recordSplitMobile {
+
+    grid-template-columns: minmax(0, 1fr);
+
+    grid-template-rows:
+
+        minmax(0, var(--split-size, 50%))
+
+        8px
+
+        minmax(0, 1fr);
+
+}
+
+
+/* PCの境界線 */
+
+#recordSplitLayout.recordSplitDesktop
+> #recordSplitDivider {
+
+    cursor: col-resize;
+
+}
+
+
+/* PCの境界線の持ち手 */
+
+#recordSplitLayout.recordSplitDesktop
+> #recordSplitDivider span {
+
+    width: 4px;
+
+    height: 50px;
+
+}
+
+
+/* スマートフォンの境界線 */
+
+#recordSplitLayout.recordSplitMobile
+> #recordSplitDivider {
+
+    cursor: row-resize;
+
+}
+
+
+/* スマートフォンの境界線の持ち手 */
+
+#recordSplitLayout.recordSplitMobile
+> #recordSplitDivider span {
+
+    width: 50px;
+
+    height: 4px;
+
+}
+
+
+/* =========================
+   分割されたページのサイズ
+========================= */
+
+#recordSplitLayout > #currentPane {
+
+    min-width: 0;
+
+    min-height: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+
+}
+
+
+#recordSplitLayout > #recordPane {
+
+    min-width: 0;
+
+    min-height: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+
+}
+
+
+/* =========================
+   記録側のヘッダー
+========================= */
+
+#recordPaneHeader {
+
+    min-width: 0;
+
+    padding: 8px;
+
+    box-sizing: border-box;
+
+}
+
+
+#recordPaneTitle {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 6px;
+
+}
+
+
+#recordHistoryTitle {
+
+    font-size: 13px;
+
+    overflow-wrap: anywhere;
+
+}
+
+
+#closeRecordSplitButton {
+
+    font-size: 12px;
+
+    padding: 5px 8px;
+
+}
+
+
+/* STEPボタンを狭い画面でも表示 */
+
+#recordStepButtons {
+
+    display: grid;
+
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 4px;
+
+    margin-top: 8px;
+
+}
+
+
+#recordStepButtons button {
+
+    min-width: 0;
+
+    font-size: 11px;
+
+    padding: 6px 2px;
+
+}
+
+
+/* =========================
+   さらに狭くなった場合
+========================= */
+
+@media screen and (max-width: 400px) {
+
+    #recordStepButtons {
+
+        grid-template-columns:
+
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+
+    #recordHistoryTitle {
+
+        font-size: 12px;
+
+    }
+
+
+    #currentScroll {
+
+        padding-left: 10px !important;
+
+        padding-right: 10px !important;
+
+    }
+
+
+    body.embeddedRecord {
+
+        padding-left: 10px;
+
+        padding-right: 10px;
+
+    }
+
+}
+
+
+/* =========================
+   記憶ボタンの折り返し
+========================= */
+
+#currentPane #memoryPanel,
+
+body.embeddedRecord #memoryPanel {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+}
+
+
+/* 記録側の記憶ボタン */
+
+body.embeddedRecord .memoryButton {
+
+    font-size: 12px;
+
+    padding: 6px 8px;
+
+}
+
+
+/* iframeが残りの高さを使用する */
+
+#recordFrame {
+
+    display: block;
+
+    width: 100%;
+
+    flex: 1;
+
+    min-height: 0;
+
+    border: none;
+
+}

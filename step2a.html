@@ -94,6 +94,8 @@
 
 function check(){
 
+    if(reviewMode) return;
+
     const ans =
         document
         .getElementById("answer")
@@ -190,11 +192,14 @@ function check(){
         ans === "こぶら"||
         ans === "コブラ"
     ){
+
+        saveStepRecord(2, ans);
+
         saveRoute(2, "A");
 
-        unlockMemory(2);
-
         nextPage = "step3a.html";
+
+        unlockMemory(2);
 
         return;
     }
@@ -204,6 +209,9 @@ function check(){
         ans === "らいん"||
         ans === "ライン"
     ){
+
+        saveStepRecord(2, ans);
+
         saveRoute(2, "B");
 
         createSmoke();

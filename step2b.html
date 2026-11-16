@@ -189,11 +189,13 @@ function check(){
         ans === "くらぶ"||
         ans === "クラブ"
     ){
+        saveStepRecord(2, ans);
+
         saveRoute(2, "A");
 
-        unlockMemory(2);
-
         nextPage = "step3a.html";
+
+        unlockMemory(2);
 
         return;
     }
@@ -204,6 +206,8 @@ function check(){
         ans === "タンイ"||
         ans === "単位"
     ){
+        saveStepRecord(2, ans);
+
         saveRoute(2, "B");
 
         createSmoke();
