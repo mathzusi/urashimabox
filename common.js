@@ -197,6 +197,26 @@ function unlockMemory(number){
     showMemory(number,true);
 }
 
+function removeMemory(number){
+
+    if(reviewMode) return;
+
+    localStorage.removeItem("memory" + number);
+
+    const panel = document.getElementById("memoryPanel");
+
+    if(panel){
+        panel.querySelectorAll(".memoryButton").forEach(button => {
+
+            if(button.textContent === memories[number]?.title){
+                button.remove();
+            }
+
+        });
+    }
+
+}
+
 
 function closeMemoryViewer(){
 

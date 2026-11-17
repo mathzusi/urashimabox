@@ -131,9 +131,6 @@
 
 </div>
 
-<button onclick="localStorage.clear();location.reload();">
-記憶リセット
-</button>
 
 
 
@@ -316,6 +313,8 @@ function check(){
         createSmoke();
 
         setTimeout(()=>{
+
+            removeMemory(1);
 
             location.href =
             "step2b.html";
