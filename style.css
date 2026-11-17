@@ -414,11 +414,15 @@ input{
 }
 
 #puzzleAAA img,
+#puzzleAAB img,
 #puzzleABA img,
+#puzzleABB img,
 #puzzleBAA img,
-#puzzleBBA img {
-    max-width: 90%;
+#puzzleBAB img,
+#puzzleBBA img,
+#puzzleBBB img {
     width: 600px;
+    max-width: 90%;
     height: auto;
     display: block;
     margin: 0 auto;
@@ -505,12 +509,15 @@ input{
         font-size: 14px;
         max-width: 90%;
     }
-
-    /* 謎の画像 */
+    
     #puzzleAAA img,
+    #puzzleAAB img,
     #puzzleABA img,
+    #puzzleABB img,
     #puzzleBAA img,
-    #puzzleBBA img {
+    #puzzleBAB img,
+    #puzzleBBA img,
+    #puzzleBBB img {
         width: 95%;
         max-width: 100%;
         height: auto;
@@ -1849,3 +1856,4 @@ body.embeddedRecord .memoryButton {
     border: none;
 
 }
+
