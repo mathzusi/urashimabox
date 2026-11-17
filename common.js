@@ -221,7 +221,23 @@ function startFog(){
 
     const page = location.pathname.split("/").pop();
 
-    if(page === "index.html" || page === "" || page.endsWith("a.html")) return;
+    // STEP4では、STEP3の分岐によって煙を切り替える
+    if(page === "step4.html"){
+
+        if(getRoute(3) !== "B") return;
+
+    }else{
+
+        // それ以外のページは従来の判定を維持
+        if(
+            page === "index.html" ||
+            page === "" ||
+            page.endsWith("a.html")
+        ){
+            return;
+        }
+
+    }
 
     const left =
         document.getElementById("fogLeft");
@@ -434,8 +450,8 @@ const pageRoutes = {
     "step2b.html": [1, "B"],
     "step3a.html": [2, "A"],
     "step3b.html": [2, "B"],
-    "step4a.html": [3, "A"],
-    "step4b.html": [3, "B"]
+    "step4.html": [3, "A"],
+    "step4.html": [3, "B"]
 };
 
 if (pageRoutes[currentPage]) {
@@ -1691,11 +1707,27 @@ function showRecordStep(step){
         : "desktop";
 
 
+    // 過去の記録のページ名を取得
+
+    let page = record.page;
+
+
+    // STEP4a・STEP4bの古い記録は
+    // 統合後のstep4.htmlで表示する
+
+    if(
+        page === "step4a.html" ||
+        page === "step4b.html"
+    ){
+        page = "step4.html";
+    }
+
+
     // 過去のページをiframe内に表示
 
     frame.src =
 
-        record.page
+        page
 
         + "?review=true"
 
@@ -1706,7 +1738,6 @@ function showRecordStep(step){
         + "&history=" + currentHistoryIndex
 
         + "&direction=" + direction;
-
 
     // 選択中のSTEPボタンを変更
 

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<script src="common.js"></script>
+
+<title>STEP4</title>
+
+
+
+</head>
+
+<body>
+
+<div id="fogLeft"></div>
+<div id="fogRight"></div>
+
+<div id="smoke-container"></div>
+
+<div id="memoryPanel"></div>
+
+<div id="ground"></div>
+
+<img
+    src="ryuuguujyou.png"
+    id="ryugujo"
+    alt="竜宮城">
+
+<h1>STEP4</h1>
+
+<!-- 記憶ポップアップ -->
+
+<div id="memoryViewer" class="modal hidden">
+
+    <div class="modalContent">
+
+        <h2 id="viewerTitle"></h2>
+
+        <p id="viewerText"></p>
+
+        <img
+            id="viewerImage"
+            class="hidden"
+            src=""
+            style="
+                max-width:250px;
+                margin-top:15px;
+                border-radius:10px;
+            ">
+
+        <button onclick="closeMemoryViewer()">
+            閉じる
+        </button>
+
+    </div>
+
+</div>
+
+<!-- STEP3でAを選んだ場合のストーリー -->
+<div id="storyA" class="hidden">
+
+    <p>
+        初めは状況が飲み込めなくて今まで気づいてなかったが、オトヒメは何やらずっと焦っている。<br>
+        ずっと煙を浴びているからなのか、意識が朦朧としてきた。<br>
+        「次がいよいよ最後の暗号です！最後まで、約束を守ってくださいね。」<br>
+        「この謎が解けたら、赤いペンでこの紙に答えを書いてください。」<br>
+    </p>
+
+    <img src="otohime.png" id="otohime" alt="乙姫">
+
+</div>
+
+
+<!-- STEP3でBを選んだ場合のストーリー -->
+<div id="storyB" class="hidden">
+
+    <p>
+        初めは状況が飲み込めなくて今まで気づいてなかったが、オトヒメは何やらずっと焦っている。<br>
+        ずっと煙を浴びているからなのか、意識が朦朧としてきた。<br>
+        「次がいよいよ最後の暗号です！最後まで、約束を守ってくださいね。」<br>
+        「この謎が解けたら、赤いペンでこの紙に答えを書いてください。」<br>
+    </p>
+
+    <!-- STEP4bで乙姫を表示する場合は、ここに画像を入れる -->
+
+</div>
+
+<br><br>
+
+<h2>
+    Lastを解き2つのペンから選んで答えを書き込もう。
+</h2><br>
+
+<h2>
+    オトヒメとの約束：<br>
+    「赤いペンで答えを書くこと」
+</h2>
+
+
+<div id="puzzleAAA" class="hidden">
+    <img src="Last-8.png">
+</div>
+
+<div id="puzzleABA" class="hidden">
+    <img src="Last-6.png">
+</div>
+
+<div id="puzzleBAA" class="hidden">
+    <img src="Last-7.png">
+</div>
+
+<div id="puzzleBBA" class="hidden">
+    <img src="Last-5.png">
+</div>
+
+<div id="puzzleAAB" class="hidden">
+    <img src="Last-4.png">
+</div>
+
+<div id="puzzleABB" class="hidden">
+    <img src="Last-2.png">
+</div>
+
+<div id="puzzleBAB" class="hidden">
+    <img src="Last-3.png">
+</div>
+
+<div id="puzzleBBB" class="hidden">
+    <img src="Last-1.png">
+</div>
+
+<br><br><input id="answer"><br>
+
+<br>
+
+<button id="redPen" onclick="check('red')">
+    赤いペンで解答
+</button>
+
+<br><br>
+
+<button id="bluePen" onclick="check('blue')">
+    青いペンで解答
+</button>
+
+<p id="result"></p>
+
+<div id="endingScreen">
+
+    <div id="answerPaper" class="hidden">
+        <div id="writtenAnswer"></div>
+    </div>
+
+    <div id="endingText"></div>
+
+    <button id="endingNextButton" class="hidden">
+        書き置きを読む
+    </button>
+
+</div>
+
+<script>
+
+const puzzleAnswers = {
+    AAA: ["いけん","イケン", "意見"],
+    AAB: ["しけん", "シケン", "試験", "私見"],
+    ABA: ["えいえん", "エイエン", "永遠"],
+    ABB: ["だえん", "ダエン", "楕円"],
+    BAA: ["らいす", "ライス"],
+    BAB: ["あいす", "アイス"],
+    BBA: ["えいぶん", "エイブン", "英文"],
+    BBB: ["だぶん", "ダブン", "駄文"]
+};
+
+let answered = false;
+
+function check(penColor){
+
+    if(reviewMode) return;
+
+    if(answered) return;
+
+    const route = getRoute(1) + getRoute(2) + getRoute(3);
+
+    const ans = document.getElementById("answer").value.trim();
+
+    const result = document.getElementById("result");
+
+    if(puzzleAnswers[route]?.includes(ans)){
+
+    answered = true;
+
+    saveStepRecord(4, ans, {
+
+        penColor: penColor
+
+    });
+
+    result.textContent = "正解！";
+
+        if(penColor === "red"){
+
+            startEnding([
+
+                "僕は赤いペンで答えを書いた。",
+                "オトヒメは知らないうちにどこかへ行ってしまったようだ...。",
+                "困って周りを見渡すと、オトヒメの書き置きがあった。"
+
+            ],  "index.html", ans, penColor, [
+
+                "「すぐに戻ります。最後の答えを書いた紙を片手で握って待っていてください。近くに置いてある封筒は絶対に開かないでくださいね！」",
+                "ちょっと待っていよう...。",
+
+                "待っていると、扉が開く音と一緒に、部屋の電気が消えた。",
+                "真っ暗で何も見えないが、正面からオトヒメの声がする。",
+                "「ウラシマ、紙を持っていない方の手を開いてこちらへ差し出してください。これはウラシマのためなのです…。",
+                "どうか…お願いします……。」"
+
+
+            ], [
+                "オトヒメと思われる手に腕を捕まれ、僕の手は何か冷たいものに触れた。",
+                "触れた瞬間、息が詰まり、激しい頭痛がした。苦しい。意識が朦朧としていく。",
+                "なんでこんな目に...。",
+
+                "オトヒメを信じちゃいけないのかな...。",
+                "そんな......。そんなことあるわけ...。"
+            ]);
+
+        }else{
+
+            startEnding([
+                "僕は青いペンで答えを書いた。",
+                "オトヒメは知らないうちにどこかへ行ってしまったようだ...。",
+                "困って周りを見渡すと、オトヒメの書き置きがあった。"
+
+            ],  "index.html",ans, penColor, [
+
+                "「すぐに戻ります。最後の答えを書いた紙を片手で握って待っていてください。近くに置いてある封筒は絶対に開かないでくださいね！」",
+                "ちょっと待っていよう...。",
+
+                "待っていると、扉が開く音と一緒に、部屋の電気が消えた。",
+                "真っ暗で何も見えないが、正面からオトヒメの声がする。",
+                "「ウラシマ、紙を持っていない方の手を開いてこちらへ差し出してください。これはウラシマのためなのです…。",
+                "どうか…お願いします……。」"
+
+            ], [
+                "オトヒメと思われる手に腕を捕まれ、僕の手は何か冷たいものに触れた。",
+                "触れた瞬間、息が詰まり、激しい頭痛がした。苦しい。意識が朦朧としていく。",
+                "なんでこんな目に...。",
+
+                "オトヒメを信じちゃいけないのかな...。",
+                "そんな......。そんなことあるわけ...。"
+            ]);
+
+        }
+
+    }else{
+
+        result.textContent = "不正解";
+
+    }
+
+}
+
+function showRoutePuzzle(){
+
+    const route =
+        getRoute(1) +
+        getRoute(2) +
+        getRoute(3);
+
+    const puzzle = document.getElementById(
+        "puzzle" + route
+    );
+
+    if(puzzle){
+        puzzle.classList.remove("hidden");
+    }
+
+}
+
+showRoutePuzzle();
+
+function showRouteStory(){
+
+    const route3 = getRoute(3);
+
+    const storyA = document.getElementById("storyA");
+    const storyB = document.getElementById("storyB");
+
+    if(route3 === "A"){
+
+        storyA.classList.remove("hidden");
+
+    }else if(route3 === "B"){
+
+        storyB.classList.remove("hidden");
+
+    }
+
+}
+
+showRouteStory();
+
+
+</script>
+
+</body>
+</html>

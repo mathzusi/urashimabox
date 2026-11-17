@@ -266,7 +266,9 @@ input{
     animation:puff 4s ease-out forwards;
 }
 
-#story{
+#story,
+#storyA,
+#storyB {
 
     max-width:700px;
 

@@ -562,8 +562,8 @@ const correctOrderA = [4, 6, 2, 3, 5];
 const correctGiftRoomA = 5;
 
 // 正解パターンB
-const correctOrderB = [1, 2, 3, 4, 6];
-const correctGiftRoomB = 3;
+const correctOrderB = [4, 6, 2, 3, 5];
+const correctGiftRoomB = 4;
 
 let selectedRooms = [];
 
@@ -708,7 +708,7 @@ function checkRoomOrder(){
             "正解！";
 
         setTimeout(() => {
-            location.href = "step4a.html";
+            location.href = "step4.html";
             unlockMemory(3);
         }, 1000);
 
@@ -721,7 +721,7 @@ function checkRoomOrder(){
             "正解！";
 
         setTimeout(() => {
-            location.href = "step4b.html";
+            location.href = "step4.html";
         }, 1000);
 
     }
