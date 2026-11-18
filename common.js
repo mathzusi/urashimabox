@@ -2173,7 +2173,7 @@ function handleBBBPastAnswer(data){
         try{frame.contentWindow?.postMessage({type:"URASIMA_PAST_USED",historyIndex,step,kind},bbbMessageOrigin());}catch(e){}
     });
     sessionStorage.setItem("bbbSpecialMode","true");
-    if(step===3 && record.page==="step3b.html") registerCrystalStep3bUse(historyIndex);
+    if(step===3 && record.page==="step3a.html") registerCrystalStep3aUse(historyIndex);
     saveRecordChainForNavigation();
     if(step===4){
         // 過去のSTEP4の解答が属する周回のルートを現在のゲームに採用。
@@ -2285,8 +2285,8 @@ window.addEventListener("load",function(){
     try{restoreRecordChainAt(window,JSON.parse(raw),0);}catch(e){console.warn("記録タブの復元に失敗しました",e);}
 });
 
-function registerCrystalStep3bUse(historyIndex){
-    const key="bbbCrystalStep3bHistories";
+function registerCrystalStep3aUse(historyIndex){
+    const key="bbbCrystalStep3aHistories";
     let ids=[];
     try{ids=JSON.parse(sessionStorage.getItem(key)||"[]");}catch(e){}
     if(!Array.isArray(ids))ids=[];
