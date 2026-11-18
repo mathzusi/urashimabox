@@ -385,12 +385,18 @@ window.addEventListener("load",function(){
     }
 
     startFog();
+    setupCrystalDisplay();
 
 });
 
 function saveRoute(step, route){
 
     if(reviewMode) return;
+
+    // 特別モード終了後の非表示は、次の周回のSTEP1解答で解除する
+    if(step === 1){
+        sessionStorage.removeItem("bbbHideRecordButton");
+    }
 
     // 以下は現在の処理のまま
 
@@ -431,6 +437,8 @@ function createRecordButton(){
 
     if(!history[olderIndex]) return;
 
+    if(!reviewMode && sessionStorage.getItem("bbbHideRecordButton") === "true") return;
+
 
     // ボタンの重複を防止
 
@@ -469,9 +477,7 @@ const pageRoutes = {
     "step2a.html": [1, "A"],
     "step2b.html": [1, "B"],
     "step3a.html": [2, "A"],
-    "step3b.html": [2, "B"],
-    "step4.html": [3, "A"],
-    "step4.html": [3, "B"]
+    "step3b.html": [2, "B"]
 };
 
 if (pageRoutes[currentPage]) {
@@ -810,6 +816,9 @@ async function startEnding(
     }
 
 
+    // 特別モードはペンの色に関係なく終了する
+    finishBBBSpecialMode();
+
     // 最初のページへ戻る
 
     location.href = "index.html";};
@@ -980,6 +989,18 @@ window.addEventListener("load", function(){
     if(!record) return;
 
 
+    // STEP1の記録は、箱を開けた後の画面で表示する
+    if(step === 1 && typeof openBox === "function"){
+        const before = document.getElementById("story");
+        const box = document.getElementById("boxButton");
+        const after = document.getElementById("after");
+        const title = document.getElementById("title");
+        if(before) before.style.display = "none";
+        if(box) box.style.display = "none";
+        if(after) after.classList.remove("hidden");
+        if(title) title.textContent = "STEP1";
+    }
+
     /* =========================
        前回の答えを復元
     ========================= */
@@ -1089,8 +1110,13 @@ window.addEventListener("load", function(){
         }
 
 
-        // それ以外の操作は無効化
+        // BBB解放後は、過去の解答ボタンだけ操作可能
+        if(canOperatePastRecord() && isPastAnswerButton(element,step)){
+            element.disabled = isPastButtonUsed(reviewHistoryIndex,step,getPastButtonKind(element));
+            return;
+        }
 
+        // それ以外の操作は無効化
         element.disabled = true;
 
     });
@@ -1987,4 +2013,316 @@ function setupRecordDivider(){
 
     );
 
+}
+
+/* =====================================================
+   BBBルート：過去の解答を現在のゲームへ反映
+   通常の履歴閲覧は従来どおり読み取り専用
+===================================================== */
+function bbbMessageOrigin(){
+    return location.protocol === "file:" ? "*" : location.origin;
+}
+function bbbTrustedMessage(event){
+    return location.protocol === "file:" ? event.origin === "null" : event.origin === location.origin;
+}
+function canOperatePastRecord(){
+    return reviewMode && sessionStorage.getItem("bbbRecordUnlocked") === "true"
+        && sessionStorage.getItem("bbbHideRecordButton") !== "true";
+}
+function isBBBSpecialMode(){
+    return !reviewMode && sessionStorage.getItem("bbbSpecialMode") === "true";
+}
+function getPastButtonKind(button){
+    if(button.id === "redPen") return "red";
+    if(button.id === "bluePen") return "blue";
+    return "answer";
+}
+function isPastAnswerButton(element,step){
+    if(element.tagName !== "BUTTON") return false;
+    if(step === 1 || step === 2) return element.getAttribute("onclick") === "check()";
+    if(step === 3) return element.getAttribute("onclick") === "checkRoomOrder()";
+    if(step === 4) return element.id === "redPen" || element.id === "bluePen";
+    return false;
+}
+function pastButtonKey(historyIndex,step,kind){
+    return historyIndex + ":" + step + ":" + kind;
+}
+function getUsedPastButtons(){
+    try {return JSON.parse(sessionStorage.getItem("bbbUsedButtons") || "{}");}
+    catch(e){return {};}
+}
+function isPastButtonUsed(historyIndex,step,kind){
+    return !!getUsedPastButtons()[pastButtonKey(historyIndex,step,kind)];
+}
+function markPastButtonUsed(historyIndex,step,kind){
+    const used=getUsedPastButtons();
+    used[pastButtonKey(historyIndex,step,kind)]=true;
+    sessionStorage.setItem("bbbUsedButtons",JSON.stringify(used));
+}
+function finishBBBSpecialMode(){
+    sessionStorage.removeItem("bbbCrystalVisible");
+    sessionStorage.removeItem("bbbRestoreRecordChain");
+    const wasSpecial=sessionStorage.getItem("bbbRecordUnlocked") === "true"
+        || sessionStorage.getItem("bbbSpecialMode") === "true";
+    if(wasSpecial) sessionStorage.setItem("bbbHideRecordButton","true");
+    ["bbbSpecialMode","bbbRecordUnlocked","bbbUsedButtons","bbbEventShown"]
+        .forEach(key=>sessionStorage.removeItem(key));
+}
+function showBBBSpecialStory(){
+    if(!isBBBSpecialMode()) return;
+    const page=location.pathname.split("/").pop();
+    const stories={
+        "index.html":"あの記録に残っていた答えを口にした瞬間、周囲の景色が歪んだ。\n気づくと、再び竜宮城で暗号に向き合っていた。\nこれは過去の続きなのか、それとも今の僕の選択なのか……。",
+        "step2a.html":"過去の記録に触れた直後、景色が切り替わった。\n記憶の中で選ばれた答えが、今の僕をこの場所へ連れてきたらしい。",
+        "step2b.html":"白い煙が視界を覆った。\n過去の記録の答えが、今の世界にまで影響している。\n薄れていく記憶を確かめながら、次の暗号に向かう。",
+        "step3a.html":"過去の記録からつながった道を、今の僕が歩いている。\nこの先の答えも、僕自身が選ばなければならない。",
+        "step3b.html":"また煙が立ち込め、思い出が遠のく。\nそれでも、過去の記録から始まったこの道を進むしかない。",
+        "step4.html":"過去の記録から続いた旅は、再び最後の暗号へたどり着いた。\n今度こそ、この答えで何が変わるのだろう。"
+    };
+    const text=stories[page];
+    if(!text)return;
+    const target=page==="index.html"
+        ?document.querySelector("#stepStory p")
+        :document.querySelector("#story p, #storyA p:not(.hidden), #storyB p:not(.hidden)");
+    if(target){target.textContent=text;target.style.whiteSpace="pre-line";}
+    if(page==="step4.html"){
+        const active=document.querySelector(getRoute(3)==="B"?"#storyB p":"#storyA p");
+        if(active){active.textContent=text;active.style.whiteSpace="pre-line";}
+    }
+}
+window.addEventListener("load",showBBBSpecialStory);
+
+// 過去のiframe内で、保存済みの解答ボタンだけをクリック可能にする
+window.addEventListener("load",function(){
+    if(!reviewMode)return;
+    const step=Number(new URLSearchParams(location.search).get("step"));
+    document.querySelectorAll("button").forEach(button=>{
+        if(!isPastAnswerButton(button,step))return;
+        const kind=getPastButtonKind(button);
+        if(isPastButtonUsed(reviewHistoryIndex,step,kind)){
+            button.disabled=true;
+            button.textContent="使用済み";
+            return;
+        }
+        button.disabled=!canOperatePastRecord();
+        button.addEventListener("click",function(event){
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if(!canOperatePastRecord() || isPastButtonUsed(reviewHistoryIndex,step,kind))return;
+            // topの確認が済んだ場合のみ使用済みにする
+            // 同一サイト内の記録iframeから現在のゲームへ直接伝える。
+            // postMessageだけに依存すると、環境によって受信できず移動しない場合がある。
+            try{
+                if(typeof window.top.handleBBBPastAnswer === "function"){
+                    window.top.handleBBBPastAnswer({historyIndex:reviewHistoryIndex,step,kind});
+                }else{
+                    window.top.postMessage({type:"URASIMA_PAST_ANSWER",historyIndex:reviewHistoryIndex,step,kind},bbbMessageOrigin());
+                }
+            }catch(error){
+                console.error("過去の解答を現在のゲームへ送れませんでした",error);
+            }
+        },true);
+    });
+});
+
+// BBB解放後、すでに表示中の入れ子の記録も操作可能にする
+function refreshBBBPastAnswerButtons(){
+    if(!reviewMode)return;
+    const step=Number(new URLSearchParams(location.search).get("step"));
+    document.querySelectorAll("button").forEach(button=>{
+        if(!isPastAnswerButton(button,step))return;
+        const used=isPastButtonUsed(reviewHistoryIndex,step,getPastButtonKind(button));
+        button.disabled=!canOperatePastRecord() || used;
+        if(used)button.textContent="使用済み";
+    });
+}
+function refreshBBBRecordTree(win=window){
+    try{
+        win.refreshBBBPastAnswerButtons?.();
+        win.document.querySelectorAll("iframe").forEach(frame=>{
+            if(frame.contentWindow)refreshBBBRecordTree(frame.contentWindow);
+        });
+    }catch(error){console.warn("記録ボタンの更新をスキップ",error);}
+}
+// 最上位の現在のゲームだけが履歴を検証し、実際のルート処理を行う
+function handleBBBPastAnswer(data){
+    if(window !== window.top || reviewMode)return;
+    if(sessionStorage.getItem("bbbRecordUnlocked")!=="true")return;
+    const {historyIndex,step,kind}=data;
+    if(!Number.isInteger(historyIndex)||!Number.isInteger(step)||step<1||step>4)return;
+    if(!["answer","red","blue"].includes(kind))return;
+    if(step!==4 && kind!=="answer")return;
+    if(step===4 && kind==="answer")return;
+    if(isPastButtonUsed(historyIndex,step,kind))return;
+    const history=getHistoryRecord(historyIndex);
+    const record=history?.records?.[step];
+    const route=history?.routes?.[step];
+    if(!record || (step<=3 && !["A","B"].includes(route)))return;
+    // 過去のSTEP4は現在のページに関係なく使用できる。
+    // ただし、その周回のルートと解答が揃っていることを確認する。
+    if(step===4){
+        const historicalRoute=[1,2,3].map(i=>history?.routes?.[i]).join("");
+        if(!/^[AB]{3}$/.test(historicalRoute) || typeof record.answer!=="string" || !record.answer.trim()){
+            alert("この周回のSTEP4の記録が不完全なため、解答を使用できません。");
+            return;
+        }
+    }
+    markPastButtonUsed(historyIndex,step,kind);
+    // ボタンを押した直後に全履歴画面へ使用済みを反映
+    document.querySelectorAll("iframe").forEach(frame=>{
+        try{frame.contentWindow?.postMessage({type:"URASIMA_PAST_USED",historyIndex,step,kind},bbbMessageOrigin());}catch(e){}
+    });
+    sessionStorage.setItem("bbbSpecialMode","true");
+    if(step===3 && record.page==="step3b.html") registerCrystalStep3bUse(historyIndex);
+    saveRecordChainForNavigation();
+    if(step===4){
+        // 過去のSTEP4の解答が属する周回のルートを現在のゲームに採用。
+        // saveRouteは後続ルートを消すので、必ずSTEP1から順に設定する。
+        for(let i=1;i<=3;i++)saveRoute(i,history.routes[i]);
+
+        // STEP1～3の記録も同じ周回に合わせ、現在の周回の記録と混在させない。
+        const priorRecords={};
+        for(let i=1;i<=3;i++){
+            if(history.records?.[i])priorRecords[i]={...history.records[i]};
+        }
+        localStorage.setItem("currentRecords",JSON.stringify(priorRecords));
+
+        // 過去の記録の解答とペンの色をSTEP4へ引き継ぐ。
+        sessionStorage.setItem("bbbPendingStep4Answer",JSON.stringify({
+            answer:record.answer,
+            penColor:kind,
+            route:[1,2,3].map(i=>history.routes[i]).join("")
+        }));
+        location.href="step4.html";
+        return;
+    }
+    // 過去の記録は変更せず、今のゲームの記録として解答を採用する
+    const records=JSON.parse(localStorage.getItem("currentRecords")||"{}");
+    records[step]={page:record.page,answer:record.answer,extra:record.extra||{}};
+    for(let i=step+1;i<=4;i++)delete records[i];
+    localStorage.setItem("currentRecords",JSON.stringify(records));
+    saveRoute(step,route);
+    const target=step===1?"step2"+route.toLowerCase()+".html"
+        :step===2?"step3"+route.toLowerCase()+".html":"step4.html";
+    if(route==="B"){
+        if(typeof createSmoke==="function")createSmoke();
+        setTimeout(()=>{
+            removeMemory(step);
+            location.href=target;
+        },2000);
+    }else{
+        // Aルートは通常と同様に記憶を獲得し、閉じると次のSTEPへ
+        nextPage=target;
+        unlockMemory(step);
+    }
+}
+// postMessage経由の旧処理とも互換性を維持
+window.addEventListener("message",function(event){
+    if(!bbbTrustedMessage(event) || event.data?.type!=="URASIMA_PAST_ANSWER")return;
+    handleBBBPastAnswer(event.data);
+});
+window.addEventListener("message",function(event){
+    if(!bbbTrustedMessage(event) || event.data?.type!=="URASIMA_PAST_USED" || !reviewMode)return;
+    const {historyIndex,step,kind}=event.data;
+    if(historyIndex!==reviewHistoryIndex || step!==Number(new URLSearchParams(location.search).get("step")))return;
+    document.querySelectorAll("button").forEach(button=>{
+        if(isPastAnswerButton(button,step) && getPastButtonKind(button)===kind){
+            button.disabled=true;button.textContent="使用済み";
+        }
+    });
+});
+
+/* =====================================================
+   記録タブの保持と「水晶」
+===================================================== */
+function getRecordChainNode(){
+    return {opened:recordSplitOpened,historyIndex:currentHistoryIndex,step:currentRecordStep,review:reviewMode,reviewHistoryIndex};
+}
+function readRecordChain(win){
+    const chain=[];
+    let current=win;
+    for(let depth=0;depth<30;depth++){
+        const state=current.getRecordChainNode?.();
+        if(!state?.opened)break;
+        const frame=current.document.getElementById("recordFrame");
+        if(!frame)break;
+        chain.push({historyIndex:state.historyIndex,step:state.step});
+        try{current=frame.contentWindow;if(!current)break;}catch(e){break;}
+    }
+    return chain;
+}
+function saveRecordChainForNavigation(){
+    if(window!==window.top)return;
+    const chain=readRecordChain(window);
+    if(chain.length){
+        sessionStorage.setItem("bbbRestoreRecordChain",JSON.stringify(chain));
+    }
+}
+function restoreRecordChainAt(win,chain,depth){
+    if(depth>=chain.length)return;
+    const target=chain[depth];
+    // 既存の履歴とSTEPが一致する場合だけ再表示
+    const state=win.getRecordChainNode?.();
+    if(!state)return;
+    const expected=state.review ? state.reviewHistoryIndex+1 : 0;
+    if(expected!==target.historyIndex || !win.getHistoryRecord(expected))return;
+    if(!state.opened)win.openRecordSplit();
+    if(!win.getRecordChainNode?.().opened)return;
+    win.showRecordStep(target.step);
+    const frame=win.document.getElementById("recordFrame");
+    if(frame && depth+1<chain.length){
+        frame.addEventListener("load",function(){
+            try{restoreRecordChainAt(frame.contentWindow,chain,depth+1);}catch(e){console.warn("記録の復元に失敗しました",e);}
+        },{once:true});
+    }
+}
+window.addEventListener("load",function(){
+    if(window!==window.top || reviewMode)return;
+    const raw=sessionStorage.getItem("bbbRestoreRecordChain");
+    if(!raw)return;
+    sessionStorage.removeItem("bbbRestoreRecordChain");
+    if(sessionStorage.getItem("bbbRecordUnlocked")!=="true")return;
+    try{restoreRecordChainAt(window,JSON.parse(raw),0);}catch(e){console.warn("記録タブの復元に失敗しました",e);}
+});
+
+function registerCrystalStep3bUse(historyIndex){
+    const key="bbbCrystalStep3bHistories";
+    let ids=[];
+    try{ids=JSON.parse(sessionStorage.getItem(key)||"[]");}catch(e){}
+    if(!Array.isArray(ids))ids=[];
+    if(!ids.includes(historyIndex))ids.push(historyIndex);
+    sessionStorage.setItem(key,JSON.stringify(ids));
+    if(ids.length>=5 && localStorage.getItem("bbbCrystalAcquired")!=="true"){
+        localStorage.setItem("bbbCrystalAcquired","true");
+        sessionStorage.setItem("bbbCrystalVisible","true");
+        alert("水晶を手にいれた");
+        setupCrystalDisplay();
+    }
+}
+function showCrystal(){
+    if(reviewMode || localStorage.getItem("bbbCrystalAcquired")!=="true")return;
+    sessionStorage.setItem("bbbCrystalVisible","true");
+    setupCrystalDisplay();
+}
+function setupCrystalDisplay(){
+    if(reviewMode)return;
+    const panel=document.getElementById("memoryPanel");
+    if(panel && (location.pathname.split("/").pop()==="index.html" || location.pathname.endsWith("/"))
+       && sessionStorage.getItem("bbbRecordUnlocked")!=="true"
+       && localStorage.getItem("bbbCrystalAcquired")==="true" && !document.getElementById("bbbCrystalMemoryButton")){
+        const button=document.createElement("button");
+        button.id="bbbCrystalMemoryButton";
+        button.className="memoryButton";
+        button.textContent="特別な記憶：水晶を手にいれた";
+        button.onclick=showCrystal;
+        panel.appendChild(button);
+    }
+    if(sessionStorage.getItem("bbbCrystalVisible")!=="true")return;
+    if(document.getElementById("bbbCrystalImage"))return;
+    const img=document.createElement("img");
+    img.id="bbbCrystalImage";
+    img.src="suisyou.png";
+    img.alt="水晶";
+    img.style.cssText="position:fixed;bottom:12vh;right:20px;width:130px;max-width:24vw;height:auto;z-index:20;pointer-events:none";
+    document.body.appendChild(img);
 }

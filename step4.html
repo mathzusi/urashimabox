@@ -192,6 +192,9 @@ function check(penColor){
 
     answered = true;
 
+    // STEP4に正解した時点で特別モードの操作を終了
+    finishBBBSpecialMode();
+
     saveStepRecord(4, ans, {
 
         penColor: penColor
@@ -304,6 +307,63 @@ function showRouteStory(){
 
 showRouteStory();
 
+function startBBBEvent() {
+
+    if (reviewMode || answered) return;
+
+    const route =
+        getRoute(1) + getRoute(2) + getRoute(3);
+
+    if (route !== "BBB" || isBBBSpecialMode()) return;
+
+    // 同じ周回で何度も演出が発生しないようにする
+    if (sessionStorage.getItem("bbbEventShown") === "true") {
+        return;
+    }
+
+    sessionStorage.setItem("bbbEventShown", "true");
+    sessionStorage.removeItem("bbbHideRecordButton");
+    sessionStorage.removeItem("bbbUsedButtons");
+
+    // めまい演出
+    document.body.classList.add("bbbDizzy");
+
+    setTimeout(() => {
+
+        document.body.classList.remove("bbbDizzy");
+
+        // ポップアップを閉じる前に解放状態を保存する。
+        // すでに開いている入れ子の記録画面も更新する。
+        sessionStorage.setItem("bbbRecordUnlocked", "true");
+        refreshBBBRecordTree();
+        alert("自分の身に何か起きたようだ");
+        createRecordButton();
+
+    }, 3000);
+}
+
+// 過去のSTEP4の解答ボタンから来た場合、現在のSTEPに関係なく
+// 保存された答えとペンの色でSTEP4のエンディングを実行する。
+function applyPastStep4Answer(){
+    if(reviewMode)return;
+    const raw=sessionStorage.getItem("bbbPendingStep4Answer");
+    if(!raw)return;
+    sessionStorage.removeItem("bbbPendingStep4Answer");
+    let pending;
+    try{pending=JSON.parse(raw);}catch(e){return;}
+    const currentRoute=getRoute(1)+getRoute(2)+getRoute(3);
+    if(currentRoute!==pending.route ||
+       !["red","blue"].includes(pending.penColor) ||
+       !puzzleAnswers[currentRoute]?.includes(pending.answer)){
+        alert("過去のSTEP4の解答を適用できませんでした。記録を確認してください。");
+        return;
+    }
+    document.getElementById("answer").value=pending.answer;
+    check(pending.penColor);
+}
+window.addEventListener("load",applyPastStep4Answer);
+
+window.addEventListener("load", startBBBEvent);
 
 </script>
 
