@@ -248,7 +248,6 @@ function startFog(){
 
     }else{
 
-        // それ以外のページは従来の判定を維持
         if(
             page === "index.html" ||
             page === "" ||
@@ -256,55 +255,82 @@ function startFog(){
         ){
             return;
         }
-
     }
 
-    const left =
-        document.getElementById("fogLeft");
+    const left = document.getElementById("fogLeft");
+    const right = document.getElementById("fogRight");
 
-    const right =
-        document.getElementById("fogRight");
+    if(!left || !right) return;
 
-    if(!left || !right){
-        return;
+    left.style.display = "block";
+    right.style.display = "block";
+
+    // スマホ表示かどうか
+    const isMobile = window.matchMedia("(max-width: 600px)").matches;
+
+    if(isMobile){
+
+        // スマホでは煙の領域を左右の端に限定
+        [left, right].forEach(area => {
+            area.style.position = "fixed";
+            area.style.top = "0";
+            area.style.width = "30px";
+            area.style.height = "100dvh";
+            area.style.overflow = "hidden";
+            area.style.pointerEvents = "none";
+            area.style.zIndex = "0";
+        });
+
+        left.style.left = "0";
+        left.style.right = "auto";
+
+        right.style.right = "0";
+        right.style.left = "auto";
     }
 
-    left.style.display="block";
-    right.style.display="block";
-
-    setInterval(()=>{
+    setInterval(() => {
 
         createFog("fogLeft");
         createFog("fogRight");
 
-    },1000);
+    }, 1000);
 }
-
 
 function createFog(id){
 
-    const area =
-        document.getElementById(id);
+    const area = document.getElementById(id);
 
-    if(!area){
-        return;
+    if(!area) return;
+
+    const fog = document.createElement("div");
+
+    fog.className = "fog";
+
+    const isMobile = window.matchMedia("(max-width: 600px)").matches;
+
+    if(isMobile){
+
+        // スマホでは小さな煙を左右の端から発生させる
+        fog.style.width = "18px";
+        fog.style.height = "18px";
+
+        fog.style.left = Math.random() * 12 + "px";
+
+        // 煙の広がりを抑える
+        fog.style.maxWidth = "18px";
+        fog.style.maxHeight = "18px";
+
+    }else{
+
+        // PCでは従来どおり
+        fog.style.left = Math.random() * 100 + "px";
     }
-
-    const fog =
-        document.createElement("div");
-
-    fog.className="fog";
-
-    fog.style.left =
-        Math.random()*100+"px";
 
     area.appendChild(fog);
 
-    setTimeout(()=>{
-
+    setTimeout(() => {
         fog.remove();
-
-    },10000);
+    }, 10000);
 }
 
 
@@ -2308,31 +2334,52 @@ function setupCrystalDisplay(){
     if(reviewMode)return;
     const panel=document.getElementById("memoryPanel");
     if(panel && (location.pathname.split("/").pop()==="index.html" || location.pathname.endsWith("/"))
+
        && sessionStorage.getItem("bbbRecordUnlocked")!=="true"
+
        && localStorage.getItem("bbbCrystalAcquired")==="true" && !document.getElementById("bbbCrystalMemoryButton")){
+
         const button=document.createElement("button");
+
         button.id="bbbCrystalMemoryButton";
+
         button.className="memoryButton";
+
         button.textContent="特別な記憶：水晶を手にいれた";
+
         button.onclick=showCrystal;
+
         panel.appendChild(button);
     }
     if(sessionStorage.getItem("bbbCrystalVisible")!=="true")return;
+
     if(document.getElementById("bbbCrystalImage"))return;
+
     const img=document.createElement("img");
+
     img.id="bbbCrystalImage";
+
     img.src="suisyou.png";
+
     img.alt="水晶";
+
     img.style.cssText="position:fixed;bottom:12vh;right:20px;width:130px;max-width:24vw;height:auto;z-index:20;pointer-events:none";
+
     document.body.appendChild(img);
 }
 
 // 水晶ストーリーから戻った際、トップページで1回だけ表示。
 window.addEventListener("load", function(){
+
     if(reviewMode) return;
+
     const page=location.pathname.split("/").pop();
+
     if(page!=="index.html" && page!=="")return;
+
     if(sessionStorage.getItem("crystalStoryReturnMessage")!=="true")return;
+
     sessionStorage.removeItem("crystalStoryReturnMessage");
+
     alert("STEP4の答えがライスになるようにしよう！");
 });

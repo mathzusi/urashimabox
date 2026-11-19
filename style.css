@@ -1892,11 +1892,32 @@ body.bbbDizzy {
     }
 }
 
-/* スマホ表示時の煙を調整 */
+/* スマホのBルート背景煙 */
 @media screen and (max-width: 600px) {
-    .smoke {
-        width: 45px !important;
-        height: 45px !important;
-        opacity: 0.3;
+
+    #fogLeft,
+    #fogRight {
+        width: 30px !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        pointer-events: none;
+    }
+
+    #fogLeft {
+        left: 0 !important;
+        right: auto !important;
+    }
+
+    #fogRight {
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    #fogLeft .fog,
+    #fogRight .fog {
+        width: 18px !important;
+        height: 18px !important;
+        max-width: 18px !important;
+        max-height: 18px !important;
     }
 }
