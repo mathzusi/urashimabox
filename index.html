@@ -204,8 +204,7 @@ function check() {
         saveRoute(1, "B");
         createSmoke();
         setTimeout(() => {
-            removeMemory(1);
-            sessionStorage.setItem("forgotMemoryPopup", "true");
+            removeMemoryWithNotice(1);
             location.href = "step2b.html";
         }, 2000);
         return;

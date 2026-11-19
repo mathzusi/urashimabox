@@ -216,8 +216,7 @@ function check(){
 
         setTimeout(()=>{
 
-            removeMemory(2);
-            sessionStorage.setItem("forgotMemoryPopup", "true");
+            removeMemoryWithNotice(2);
             location.href =
             "step3b.html";
 

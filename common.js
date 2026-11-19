@@ -217,6 +217,20 @@ function removeMemory(number){
 
 }
 
+function removeMemoryWithNotice(number){
+
+    const hadMemory =
+        localStorage.getItem("memory" + number) === "true";
+
+    removeMemory(number);
+
+    if(hadMemory){
+        sessionStorage.setItem("forgotMemoryPopup", "true");
+    }else{
+        sessionStorage.removeItem("forgotMemoryPopup");
+    }
+}
+
 
 function closeMemoryViewer(){
 
@@ -463,11 +477,6 @@ function saveRoute(step, route){
 
     if(reviewMode) return;
 
-    // 特別モード終了後の非表示は、次の周回のSTEP1解答で解除する
-    if(step === 1){
-        sessionStorage.removeItem("bbbHideRecordButton");
-    }
-
     // 以下は現在の処理のまま
 
     localStorage.setItem("route" + step, route);
@@ -506,8 +515,6 @@ function createRecordButton(){
     // ボタンを表示しない
 
     if(!history[olderIndex]) return;
-
-    if(!reviewMode && sessionStorage.getItem("bbbHideRecordButton") === "true") return;
 
 
     // ボタンの重複を防止
@@ -2290,9 +2297,21 @@ function handleBBBPastAnswer(data){
         :step===2?"step3"+route.toLowerCase()+".html":"step4.html";
     if(route==="B"){
     if(typeof createSmoke==="function")createSmoke();
+
     setTimeout(()=>{
+        // 削除対象の記憶を実際に持っているか確認
+        const hadMemory =
+            localStorage.getItem("memory" + step) === "true";
+
         removeMemory(step);
-        sessionStorage.setItem("forgotMemoryPopup", "true");
+
+        // 実際に記憶を失った場合だけポップアップを表示
+        if(hadMemory){
+            sessionStorage.setItem("forgotMemoryPopup", "true");
+        }else{
+            sessionStorage.removeItem("forgotMemoryPopup");
+        }
+
         location.href=target;
     },2000);
     }else{
