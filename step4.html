@@ -525,14 +525,18 @@ function startBBBEvent() {
 
     setTimeout(() => {
 
-        document.body.classList.remove("bbbDizzy");
+    document.body.classList.remove("bbbDizzy");
 
-        // ポップアップを閉じる前に解放状態を保存する。
-        // すでに開いている入れ子の記録画面も更新する。
-        sessionStorage.setItem("bbbRecordUnlocked", "true");
-        refreshBBBRecordTree();
-        alert("自分の身に何か起きたようだ");
-        createRecordButton();
+    // 特殊演出の解放状態を保存
+    sessionStorage.setItem("bbbRecordUnlocked", "true");
+
+    // 記録画面を更新
+    refreshBBBRecordTree();
+
+    // 記憶解禁と同じ形式のポップアップを表示
+    showGameNotice("自分の身に何か起きたようだ");
+
+    createRecordButton();
 
     }, 3000);
 }

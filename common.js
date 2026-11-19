@@ -2154,7 +2154,7 @@ window.addEventListener("load",function(){
         const kind=getPastButtonKind(button);
         if(isPastButtonUsed(reviewHistoryIndex,step,kind)){
             button.disabled=true;
-            button.textContent="使用済み";
+            button.textContent="解答済み";
             return;
         }
         button.disabled=!canOperatePastRecord();
@@ -2186,7 +2186,7 @@ function refreshBBBPastAnswerButtons(){
         if(!isPastAnswerButton(button,step))return;
         const used=isPastButtonUsed(reviewHistoryIndex,step,getPastButtonKind(button));
         button.disabled=!canOperatePastRecord() || used;
-        if(used)button.textContent="使用済み";
+        if(used)button.textContent="解答済み";
     });
 }
 function refreshBBBRecordTree(win=window){
@@ -2258,11 +2258,12 @@ function handleBBBPastAnswer(data){
     const target=step===1?"step2"+route.toLowerCase()+".html"
         :step===2?"step3"+route.toLowerCase()+".html":"step4.html";
     if(route==="B"){
-        if(typeof createSmoke==="function")createSmoke();
-        setTimeout(()=>{
-            removeMemory(step);
-            location.href=target;
-        },2000);
+    if(typeof createSmoke==="function")createSmoke();
+    setTimeout(()=>{
+        removeMemory(step);
+        sessionStorage.setItem("forgotMemoryPopup", "true");
+        location.href=target;
+    },2000);
     }else{
         // Aルートは通常と同様に記憶を獲得し、閉じると次のSTEPへ
         nextPage=target;
@@ -2280,7 +2281,7 @@ window.addEventListener("message",function(event){
     if(historyIndex!==reviewHistoryIndex || step!==Number(new URLSearchParams(location.search).get("step")))return;
     document.querySelectorAll("button").forEach(button=>{
         if(isPastAnswerButton(button,step) && getPastButtonKind(button)===kind){
-            button.disabled=true;button.textContent="使用済み";
+            button.disabled=true;button.textContent="解答済み";
         }
     });
 });
@@ -2410,3 +2411,59 @@ window.addEventListener("load", function(){
 
     alert("STEP4の答えがライスになるようにしよう！");
 });
+
+window.addEventListener("load", function() {
+
+    if(sessionStorage.getItem("forgotMemoryPopup") === "true") {
+
+        sessionStorage.removeItem("forgotMemoryPopup");
+
+        setTimeout(() => {
+            showGameNotice("煙を浴びて、記憶を一つ忘れてしまった！");
+        }, 300);
+
+    }
+
+});
+
+function showGameNotice(message) {
+
+    // ポップアップを作成
+    const popup = document.createElement("div");
+    popup.className = "modal";
+
+    popup.style.position = "fixed";
+    popup.style.inset = "0";
+    popup.style.background = "rgba(0,0,0,0.7)";
+    popup.style.display = "flex";
+    popup.style.justifyContent = "center";
+    popup.style.alignItems = "center";
+    popup.style.zIndex = "99999";
+
+    const content = document.createElement("div");
+    content.className = "modalContent";
+
+    content.style.background = "white";
+    content.style.color = "black";
+    content.style.padding = "30px";
+    content.style.borderRadius = "15px";
+    content.style.maxWidth = "500px";
+    content.style.width = "80%";
+    content.style.textAlign = "center";
+
+    const text = document.createElement("p");
+    text.textContent = message;
+
+    const button = document.createElement("button");
+    button.textContent = "閉じる";
+
+    button.onclick = function() {
+        popup.remove();
+    };
+
+    content.appendChild(text);
+    content.appendChild(button);
+    popup.appendChild(content);
+
+    document.body.appendChild(popup);
+}
