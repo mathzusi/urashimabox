@@ -276,7 +276,7 @@ function startFog(){
             area.style.top = "0";
             area.style.width = "30px";
             area.style.height = "100dvh";
-            area.style.overflow = "hidden";
+            area.style.overflow = "visible";
             area.style.pointerEvents = "none";
             area.style.zIndex = "0";
         });
@@ -288,12 +288,38 @@ function startFog(){
         right.style.left = "auto";
     }
 
+    if(isMobile){
+
+    // スマホ：左右それぞれランダムな間隔で煙を出す
+    function spawnMobileFog(id){
+
+        createFog(id);
+
+        // 250〜850ミリ秒のランダムな間隔
+        const delay = 250 + Math.random() * 600;
+
+        setTimeout(() => {
+            spawnMobileFog(id);
+        }, delay);
+    }
+
+    spawnMobileFog("fogLeft");
+
+    // 左右が同時に噴き出さないようにする
+    setTimeout(() => {
+        spawnMobileFog("fogRight");
+    }, 400);
+
+}else{
+
+    // PC：従来の設定を維持
     setInterval(() => {
 
         createFog("fogLeft");
         createFog("fogRight");
 
     }, 1000);
+}
 }
 
 function createFog(id){
@@ -310,21 +336,22 @@ function createFog(id){
 
     if(isMobile){
 
-        // スマホでは小さな煙を左右の端から発生させる
-        fog.style.width = "18px";
-        fog.style.height = "18px";
+    // 煙のサイズをランダムにする（35〜50px）
+    const size = 35 + Math.random() * 15;
 
-        fog.style.left = Math.random() * 12 + "px";
+    fog.style.width = size + "px";
+    fog.style.height = size + "px";
 
-        // 煙の広がりを抑える
-        fog.style.maxWidth = "18px";
-        fog.style.maxHeight = "18px";
+    // 発生位置を少しランダムにする
+    fog.style.left = Math.random() * 10 + "px";
 
-    }else{
+    fog.style.maxWidth = size + "px";
+    fog.style.maxHeight = size + "px";
 
-        // PCでは従来どおり
-        fog.style.left = Math.random() * 100 + "px";
-    }
+}else{
+
+    fog.style.left = Math.random() * 100 + "px";
+}
 
     area.appendChild(fog);
 

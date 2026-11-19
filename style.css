@@ -1892,15 +1892,23 @@ body.bbbDizzy {
     }
 }
 
-/* スマホのBルート背景煙 */
 @media screen and (max-width: 600px) {
 
+    /* 左右の煙の発生領域 */
     #fogLeft,
     #fogRight {
-        width: 30px !important;
+        position: fixed !important;
+        top: 0 !important;
+        width: 45px !important;
         height: 100dvh !important;
-        overflow: hidden !important;
-        pointer-events: none;
+
+        /* 煙が途中で切れないようにする */
+        overflow: visible !important;
+
+        pointer-events: none !important;
+
+        /* 背景より手前、文章より奥 */
+        z-index: 1 !important;
     }
 
     #fogLeft {
@@ -1913,11 +1921,21 @@ body.bbbDizzy {
         left: auto !important;
     }
 
+    /* 煙のサイズはJavaScriptで制御 */
     #fogLeft .fog,
     #fogRight .fog {
-        width: 18px !important;
-        height: 18px !important;
-        max-width: 18px !important;
-        max-height: 18px !important;
+        max-width: 50px;
+        max-height: 50px;
+    }
+
+    /* 文章やボタンを煙より手前に表示 */
+    #story,
+    #storyA,
+    #storyB,
+    #after,
+    #memoryPanel {
+        position: relative;
+        z-index: 2;
     }
 }
+
