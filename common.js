@@ -295,8 +295,8 @@ function startFog(){
 
         createFog(id);
 
-        // 250〜850ミリ秒のランダムな間隔
-        const delay = 250 + Math.random() * 600;
+        // ランダムな間隔
+        const delay = 200 + Math.random() * 500;
 
         setTimeout(() => {
             spawnMobileFog(id);

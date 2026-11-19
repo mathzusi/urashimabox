@@ -1939,3 +1939,11 @@ body.bbbDizzy {
     }
 }
 
+@media screen and (max-width: 600px) {
+    img[src*="otohime.png"] {
+        width: 50% !important;
+        max-width: 240px !important;
+        height: auto !important;
+    }
+}
+
