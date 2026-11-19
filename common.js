@@ -1155,7 +1155,7 @@ window.addEventListener("load", function(){
 
     if(result){
 
-        result.textContent = "前回の解答：正解！";
+        result.textContent = "過去の解答：正解！";
 
     }
 
