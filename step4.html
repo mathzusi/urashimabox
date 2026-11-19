@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
+
 <script src="common.js"></script>
 
 <title>STEP4</title>
@@ -192,6 +193,15 @@ function check(penColor){
 
     answered = true;
 
+    // 水晶を手に持っている場合だけ、暗転しない特別ストーリーへ。
+    if (localStorage.getItem("bbbCrystalAcquired") === "true" &&
+        sessionStorage.getItem("bbbCrystalVisible") === "true") {
+        saveStepRecord(4, ans, {penColor: penColor});
+        result.textContent = "正解！";
+        startCrystalStory(route, ans, penColor);
+        return;
+    }
+
     // STEP4に正解した時点で特別モードの操作を終了
     finishBBBSpecialMode();
 
@@ -265,6 +275,116 @@ function check(penColor){
 
     }
 
+}
+
+
+// 水晶を持ってSTEP4を解いたときだけ使う、暗転しないストーリー。
+function startCrystalStory(route, answer, penColor) {
+    if (document.getElementById("crystalStoryScreen")) return;
+
+    // 現在のゲームはそのまま保持し、画面全体を明るいストーリー画面で覆う。
+    const screen = document.createElement("section");
+    screen.id = "crystalStoryScreen";
+    screen.setAttribute("aria-label", "水晶の特別ストーリー");
+    screen.innerHTML = `
+      <div class="crystalStoryCard">
+        <h2>水晶の記憶</h2>
+        <p id="crystalStoryLine"></p>
+        <form id="crystalStoryForm" class="hidden">
+          <label for="crystalStoryInput">オトヒメに伝えよう</label>
+          <input id="crystalStoryInput" type="text" autocomplete="off" aria-label="オトヒメに伝えよう">
+          <button type="submit">伝える</button>
+          <p id="crystalStoryError" role="status"></p>
+        </form>
+        <button id="crystalStoryNext" type="button">次へ</button>
+      </div>`;
+    document.body.appendChild(screen);
+
+    const css = document.createElement("style");
+    css.textContent = `
+      #crystalStoryScreen { position:fixed; inset:0; z-index:100001;
+        background:#44b9c9; color:white; overflow-y:auto; padding:35px 18px;
+        box-sizing:border-box; display:flex; justify-content:center; align-items:center; }
+      #crystalStoryScreen .crystalStoryCard { width:min(100%,720px); margin:auto;
+        border:2px solid white; border-radius:16px; padding:28px 22px;
+        box-sizing:border-box; background:rgba(255,255,255,.08); }
+      #crystalStoryLine { font-size:19px; line-height:1.9; white-space:pre-wrap; }
+      #crystalStoryForm { margin-top:20px; }
+      #crystalStoryForm label { display:block; margin-bottom:10px; font-weight:bold; }
+      #crystalStoryInput { width:min(100%,380px); max-width:100%; }
+      #crystalStoryError { color:#fff0a8; min-height:1.5em; }
+      #crystalStoryNext { margin-top:18px; }
+      @media(max-width:600px){#crystalStoryLine{font-size:16px;}}
+    `;
+    document.head.appendChild(css);
+
+    // inputで指定するのは、各「」の中の語句。
+    // 2つある場面は、両方の語句を順番に入力する（助詞や空白は許容）。
+    const scenes = [
+      {text:"水晶が無いと思ったらウラシマの手に…"},
+      {text:"日記帳を読んだのですね…知られてしまった以上仕方ありません"},
+      {text:"私には謎が解けなくて、ウラシマに託したのです"},
+      {text:"ですがこれで大丈夫です"},
+      {text:"戻って箱を開けずにいてください"},
+      {text:"・「玉手箱」が「開いて」しまう", answers:["玉手箱開いて","玉手箱が開いて"]},
+      {text:"あの箱がそんな箱だったなんて…そんな…それならどうしたら良いのでしょう…"},
+      {text:"・「一緒」に「戻ろう」", answers:["一緒戻ろう","一緒に戻ろう"]},
+      {text:"お恥ずかしいことに、水晶を持ち運んだときに手に怪我をしてしまって文字が書けないのです"},
+      {text:"せっかく解決策が見つかったのに私のせいで…"},
+      {text:"・[日記帳]を「破る」", answers:["破る"]},
+      {text:"日記帳をどう破れば良いのでしょうか？"},
+      {text:"・破る文字は「らいす」", answers:["らいす","ライス"]}
+    ];
+    let position = 0;
+    const line = screen.querySelector("#crystalStoryLine");
+    const form = screen.querySelector("#crystalStoryForm");
+    const input = screen.querySelector("#crystalStoryInput");
+    const error = screen.querySelector("#crystalStoryError");
+    const next = screen.querySelector("#crystalStoryNext");
+    function normalize(v) {return v.normalize("NFKC").replace(/[\s　、。・「」『』]/g,"").trim();}
+    function render() {
+        const scene = scenes[position];
+        line.textContent = scene.text.replace(/^・/,"");
+        const needsInput = Array.isArray(scene.answers);
+        form.classList.toggle("hidden", !needsInput);
+        next.classList.toggle("hidden", needsInput);
+        input.value = "";
+        error.textContent = "";
+        if(needsInput) input.focus();
+    }
+    function advance() {
+        position++;
+        if(position < scenes.length) {render(); return;}
+        finishCrystalStory(route, penColor);
+    }
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+        const valid = scenes[position].answers.some(a => normalize(a) === normalize(input.value));
+        if(!valid) {error.textContent="伝える言葉が違うようだ。"; return;}
+        advance();
+    });
+    next.addEventListener("click", advance);
+    render();
+}
+
+function finishCrystalStory(route, penColor) {
+    // 通常のエンディングと同様に周回記録を確定する。
+    if(penColor === "blue") {
+        for(let i=1;i<=3;i++)localStorage.removeItem("memory"+i);
+        localStorage.removeItem("playHistory");
+        localStorage.removeItem("previousRecords");
+        localStorage.removeItem("currentRecords");
+    } else {
+        savePreviousRecords();
+    }
+    for(let i=1;i<=3;i++)localStorage.removeItem("route"+i);
+    finishBBBSpecialMode();
+    if(route === "BAA") {
+        location.href = "clear.html";
+    } else {
+        sessionStorage.setItem("crystalStoryReturnMessage", "true");
+        location.href = "index.html";
+    }
 }
 
 function showRoutePuzzle(){

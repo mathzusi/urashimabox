@@ -2326,3 +2326,13 @@ function setupCrystalDisplay(){
     img.style.cssText="position:fixed;bottom:12vh;right:20px;width:130px;max-width:24vw;height:auto;z-index:20;pointer-events:none";
     document.body.appendChild(img);
 }
+
+// 水晶ストーリーから戻った際、トップページで1回だけ表示。
+window.addEventListener("load", function(){
+    if(reviewMode) return;
+    const page=location.pathname.split("/").pop();
+    if(page!=="index.html" && page!=="")return;
+    if(sessionStorage.getItem("crystalStoryReturnMessage")!=="true")return;
+    sessionStorage.removeItem("crystalStoryReturnMessage");
+    alert("STEP4の答えがライスになるようにしよう！");
+});
