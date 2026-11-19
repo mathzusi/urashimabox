@@ -405,8 +405,9 @@
 <div id="remembered">
 
     <p>
-        ・ウラシマ全部で５つの部屋を周り、５つのイベントに参加した。<br>
-        ・その日は竜宮城にある全ての部屋でイベントが行われた。<br>
+        ・ウラシマは全部で５つの部屋を周り、５つのイベントに参加した。<br>
+        ・その日は竜宮城にある全ての部屋で1回ずつイベントが行われた。<br>
+        ・最初に開催されたイベントから順に、第1イベント、第2イベント...と呼んでいる。<br>
         ・イベントは同じ時間に2つ以上開催されることはない<br>
         ・イベントはその部屋にいる全員が参加する。<br>
         ・玉手箱を貰うイベントにだけオトヒメがいた。<br>
@@ -530,25 +531,29 @@
     解答
 </button>
 
+<button type="button" id="resetRoomButton" onclick="resetRooms()" style="margin-left: 8px;">
+    選択をリセット
+</button>
+
 <script>
 
 
 
 const talks={
 
-1:"カレイ「僕はあの日、3つのイベントに参加したよ。松の部屋でやった1つ目のイベント楽しかったな〜。僕が参加したイベント、全部ウラシマもいたよね！」",
+1:"カレイ「僕はあの日、3つの部屋に行って参加したよ。松の部屋でやった第1イベント楽しかったな〜。僕が参加したイベント、全部ウラシマもいたよね！」",
 
-2:"ヒラメ「俺は楓の部屋と竹の部屋の2部屋でやってたイベントに参加したぜ！3つ目のイベントが楽しかったけど、どっちの部屋でやったっけな。どっちの部屋にもウラシマがいたのは覚えてるぜ！」",
+2:"ヒラメ「俺は楓の部屋と竹の部屋の2部屋でやってたイベントに参加したぜ！第3イベントが楽しかったけど、どっちの部屋でやったっけな。どっちの部屋にもウラシマがいたのは覚えてるぜ！俺は行けてないけど、ウラシマが参加してた1番大きな部屋でやってたイベントも楽しそうだったよな。」",
 
-3:"イカ「あの日は2つ目のイベントに参加した。その部屋には3匹いた。他のイベントは行ってない。」",
+3:"イカ「あの日は第2イベントに参加した。その部屋には3匹いた。他のイベントは行ってない。」",
 
-4:"タコ「ボクはエイと同じ部屋にだけ居たね。そういえば、お土産の箱は最初の部屋で渡していたって聞いたよ。」",
+4:"タコ「ボクは1回だけカレイと会ったね。そういえば、お土産の箱は最初の部屋で渡していたって聞いたよ。」",
 
-5:"エイ「私は3つ目と4つ目のイベントに参加しました。どちらも4匹以上居ましたね。遊んだ部屋は楓の部屋と桜の部屋ですが、遊んだ順番までは思い出せないです。」",
+5:"エイ「私は第3と第4のイベントに参加しました。どちらも4匹以上居ましたね。遊んだ部屋は楓の部屋と桜の部屋ですが、遊んだ順番までは思い出せないです。」",
 
-6:"カメ「1つ目と2つ目と5つ目のイベントには行って無いけど、それ以外は全部行ったよ！」",
+6:"カメ「第1、第2、第5イベントには行って無いけど、それ以外は全部行ったよ！」",
 
-7:"ウミウシ「生き物が多いのが苦手だから、乙姫以外に居た生き物の数が3匹以下の3つのイベントに居たよ。それ以外は全部4匹以上居て、怖くて入れなかった...。」",
+7:"ウミウシ「生き物が多いのが苦手だから、乙姫以外に居る生き物の数が、ぼくも含めて3匹以下の3つのイベントに居たよ。それ以外は全部4匹以上居て、怖くて入れなかった...。タコには一度も会わなかったな...。」",
 
 };
 
@@ -585,91 +590,33 @@ let answered = false;
 function selectRoom(roomNumber){
 
     if(reviewMode && !restoringRecord) return;
+    if(answered && !restoringRecord) return;
 
-    /*
-       判定中なら何もしない
-    */
-
-    if(checkingRooms){
-
-        return;
-
+    // 選択済みの部屋をもう一度押したら、その選択を取り消す
+    const existingIndex = selectedRooms.indexOf(roomNumber);
+    if(existingIndex !== -1){
+        selectedRooms.splice(existingIndex, 1);
+    }else{
+        if(selectedRooms.length >= 5) return;
+        selectedRooms.push(roomNumber);
     }
 
+    // 丸数字を作り直し、選択順に番号を振り直す
+    document.querySelectorAll(".selectionNumber")
+        .forEach(number => number.remove());
 
-    /*
-       すでに選択した部屋なら
-       何もしない
-    */
+    selectedRooms.forEach((room, index) => {
+        const roomButton = document.querySelector(".room" + room);
+        if(!roomButton) return;
+        const number = document.createElement("div");
+        number.className = "selectionNumber";
+        number.textContent = index + 1;
+        roomButton.appendChild(number);
+    });
 
-    if(selectedRooms.includes(roomNumber)){
-
-        return;
-
-    }
-
-
-    /*
-       5つ選択済みなら
-       それ以上押せない
-    */
-
-    if(selectedRooms.length >= 5){
-
-        return;
-
-    }
-
-
-    /*
-       選択した部屋を記録
-    */
-
-    selectedRooms.push(roomNumber);
-
-
-    /*
-       選択した順番の丸数字を作る
-    */
-
-    const number =
-        document.createElement("div");
-
-    number.className =
-        "selectionNumber";
-
-    number.textContent =
-        selectedRooms.length;
-
-
-    /*
-       押した部屋のボタンを取得
-    */
-
-    const roomButton =
-        document.querySelector(
-            ".room" + roomNumber
-        );
-
-
-    /*
-       丸数字を部屋ボタンの上に表示
-    */
-
-    roomButton.appendChild(number);
-
-
-    /*
-      5つ選択したら
-      それ以上選べないようにする
-    */
-
-    if(selectedRooms.length === 5){
-
-    checkingRooms = true;
-
-    }
-
+    checkingRooms = false;
+    const result = document.getElementById("mapResult");
+    if(result && !reviewMode) result.textContent = "";
 }
 
 function checkRoomOrder(){
@@ -762,6 +709,7 @@ function checkRoomOrder(){
         // 2秒後に記憶③を削除してSTEP4へ
         setTimeout(() => {
             removeMemory(3);
+            sessionStorage.setItem("forgotMemoryPopup", "true");
             location.href = "step4.html";
         }, 2000);
 
@@ -773,15 +721,15 @@ function checkRoomOrder(){
         document.getElementById("mapResult").textContent =
             "不正解";
 
-        setTimeout(() => {
-            resetRooms();
-        }, 1000);
+        // 不正解でも選択状態は維持し、そのまま修正できる。
 
     }
 
 }
 
 function resetRooms(){
+
+    if(reviewMode || answered) return;
 
     selectedRooms = [];
 
