@@ -288,7 +288,11 @@ function startCrystalStory(route, answer, penColor) {
     screen.setAttribute("aria-label", "水晶の特別ストーリー");
     screen.innerHTML = `
       <div class="crystalStoryCard">
-        <h2>水晶の記憶</h2>
+        <img
+    src="otohime.png"
+    alt="オトヒメ"
+    class="crystalStoryOtohime"
+>
         <form id="crystalStoryForm">
           <p id="crystalStoryLine"></p>
           <div id="crystalStoryAnswerArea" class="hidden">
@@ -303,6 +307,12 @@ function startCrystalStory(route, answer, penColor) {
 
     const css = document.createElement("style");
     css.textContent = `
+    .crystalStoryOtohime {
+    display: block;
+    width: 220px;
+    max-width: 70%;
+    height: auto;
+    margin: 0 auto 24px;}
       #crystalStoryScreen { position:fixed; inset:0; z-index:100001;
         background:#44b9c9; color:white; overflow-y:auto; padding:35px 18px;
         box-sizing:border-box; display:flex; justify-content:center; align-items:center; }
@@ -345,7 +355,50 @@ function startCrystalStory(route, answer, penColor) {
     const answerArea = screen.querySelector("#crystalStoryAnswerArea");
     const error = screen.querySelector("#crystalStoryError");
     const next = screen.querySelector("#crystalStoryNext");
-    function normalize(v) {return v.normalize("NFKC").replace(/[\s　]/g,"").trim();}
+
+
+
+function normalize(v) {
+    let text = v
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/\s/g, "")
+        .replace(/[ァ-ヶ]/g, c =>
+            String.fromCharCode(c.charCodeAt(0) - 0x60)
+        );
+
+    const aliases = {
+        "玉手箱": "たまてばこ",
+        "開いて": "ひらいて",
+        "あいて": "ひらいて",
+        "一緒": "いっしょ",
+        "戻ろう": "もどろう",
+        "日記帳": "にっきちょう",
+        "破る": "やぶる"
+    };
+
+    return aliases[text] ?? text;
+}
+
+// 各入力欄で許容する単語
+const acceptedAnswers = {
+    "玉手箱": ["玉手箱", "たまてばこ", "箱", "はこ"],
+    "開いて": ["開いて", "ひらいて", "あいて",],
+    "一緒": ["一緒", "いっしょ", "共に", "ともに"],
+    "戻ろう": ["戻ろう", "もどろう"],
+    "日記帳": ["日記帳", "にっきちょう", "日記"],
+    "破る": ["破る", "やぶる", "ちぎる", "破いて"],
+    "らいす": ["らいす", "ライス"]
+};
+
+function isAcceptedAnswer(input, answer) {
+    const candidates = acceptedAnswers[answer] ?? [answer];
+
+    return candidates.some(candidate =>
+        normalize(input) === normalize(candidate)
+    );
+}
+
     function render() {
         const scene = scenes[position];
         const needsInput = Array.isArray(scene.answers);
@@ -358,7 +411,6 @@ function startCrystalStory(route, answer, penColor) {
                     field.type = "text";
                     field.className = "crystalInlineInput";
                     field.dataset.length = String(scene.answers[i].length);
-                    field.maxLength = scene.answers[i].length;
                     field.autocomplete = "off";
                     field.setAttribute("aria-label", `穴埋め${i+1}`);
                     line.appendChild(field);
@@ -382,7 +434,7 @@ function startCrystalStory(route, answer, penColor) {
         const scene = scenes[position];
         if (!scene.answers) return;
         const fields = [...line.querySelectorAll("input")];
-        const valid = scene.answers.every((a, i) => normalize(fields[i].value) === normalize(a));
+        const valid = scene.answers.every((a, i) => isAcceptedAnswer(fields[i].value, a));
         if(!valid) {error.textContent="穴埋めの言葉が違うようだ。"; return;}
         advance();
     });
