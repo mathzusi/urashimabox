@@ -1891,3 +1891,12 @@ body.bbbDizzy {
         filter: blur(0);
     }
 }
+
+/* スマホ表示時の煙を調整 */
+@media screen and (max-width: 600px) {
+    .smoke {
+        width: 45px !important;
+        height: 45px !important;
+        opacity: 0.3;
+    }
+}
