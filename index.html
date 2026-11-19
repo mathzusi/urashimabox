@@ -5,82 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 <script src="common.js"></script>
-
 <title>浦島太郎</title>
-
+<style>
+/* 「開けずに待つ」専用。既存のstyle.cssは変更不要 */
+#waitButton { margin: 12px auto; }
+#waitStory { white-space: pre-line; font-size: 20px; line-height: 1.8; margin: 20px auto; text-align: center; }
+#box.waitBoxShaking { animation: waitBoxShake .12s linear infinite; }
+@keyframes waitBoxShake {
+  0%, 100% { transform: translateX(-6px) rotate(-2deg); }
+  50% { transform: translateX(6px) rotate(2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #box.waitBoxShaking { animation-duration: .5s; }
+}
+</style>
 </head>
-
 <body>
-
 <div id="memoryPanel"></div>
-
-
 <div id="ground"></div>
-
 <div id="fogLeft"></div>
 <div id="fogRight"></div>
-
-<img
-    src="ryuuguujyou.png"
-    id="ryugujo"
-    alt="竜宮城">
+<img src="ryuuguujyou.png" id="ryugujo" alt="竜宮城">
 
 <!-- 記憶ポップアップ -->
 <div id="memoryViewer" class="modal hidden">
-
     <div class="modalContent">
-
         <h2 id="viewerTitle"></h2>
-
         <p id="viewerText"></p>
-
-        <img
-            id="viewerImage"
-            class="hidden"
-            src=""
-            style="
-                max-width:250px;
-                margin-top:15px;
-                border-radius:10px;
-            ">
-
-        <button onclick="closeMemoryViewer()">
-            閉じる
-        </button>
-
+        <img id="viewerImage" class="hidden" src="" style="max-width:250px;margin-top:15px;border-radius:10px;">
+        <button onclick="closeMemoryViewer()">閉じる</button>
     </div>
-
 </div>
 
-
 <h1 id="title">STORY</h1>
-
 <div id="story">
-
     <p>
     竜宮城を満喫して帰ってきたばかりのウラシマ。<br>
     オトヒメから「開けてはいけない」と言われてこの箱を貰ったけど...。<br>
     気になるから開けちゃおう！
     </p>
-    
-    <img
-        src="tamatebako.png"
-        id="box"
-    alt="玉手箱">
-
+    <img src="tamatebako.png" id="box" alt="玉手箱">
+    <!-- 箱の下にストーリーを表示 -->
+    <p id="waitStory" aria-live="polite"></p>
 </div>
 
 <div id="smoke-container"></div>
-
-<button id="boxButton" onclick="openBox()">
-    開ける
-</button>
-
+<button id="boxButton" onclick="openBox()">開ける</button>
+<button id="waitButton" class="hidden" onclick="waitWithoutOpening()">開けずに待つ</button>
 
 <div id="after" class="hidden">
-
-        <div id="stepStory">
-
+    <div id="stepStory">
         <p>
         箱を開けた瞬間、白い煙があたりを包み、気づけば僕は竜宮城にいた。<br>
         色々な記憶が薄れている気がする。ただ、竜宮城に前に来たことがあるのは覚えている。<br>
@@ -95,243 +69,150 @@
         「...あった！ウラシマ、あなたがこの状況で助かるには、この暗号を解いて私に答えを伝えるのです。」<br>
         「ただし、ただ解いて良いわけではありません。暗号を解くときは、
         </p>
-
         <h2>”私との約束に従うこと”</h2>
-
-        <p>
-        ...絶対に守るのですよ？」<br>
-        </p>
-
-        <img
-            src="ikariotohime.png"
-            id="otohime"
-        alt="怒り乙姫">
-
-        <p>
-        なんだかよくわからないが、今の僕にはその暗号を解くしか選択肢はないようだ...。
-        </p>
-
+        <p>...絶対に守るのですよ？」<br></p>
+        <img src="ikariotohime.png" id="otohime" alt="怒り乙姫">
+        <p>なんだかよくわからないが、今の僕にはその暗号を解くしか選択肢はないようだ...。</p>
     </div>
-
     <h2>まずはA〜Dを解き、Eの答えを導こう。</h2><br>
-
-    <h2>
-        オトヒメとの約束：
-    <br>
-        「ピースの白い面は使わないこと」
-    </h2>
-
+    <h2>オトヒメとの約束：<br>「ピースの白い面は使わないこと」</h2>
     <input id="answer">
-
-    <button class="answerButton" onclick="check()">
-        解答
-    </button>
-
+    <button class="answerButton" onclick="check()">解答</button>
     <p id="result"></p>
-
 </div>
 
-
-
 <script>
+let boxOpening = false;
+let waitingForBox = false;
+let boxOpened = false;
 
-function openBox(){
+// 既存の周回履歴が1件以上あれば2周目以降と判定。
+// 青ペン等で履歴が消去された場合は新しい周回として扱われる。
+function hasCompletedRound() {
+    if (typeof getPlayHistory === "function") {
+        try {
+            const history = getPlayHistory();
+            if (Array.isArray(history)) return history.length > 0;
+        } catch (e) { console.warn("周回履歴の確認に失敗しました", e); }
+    }
+    try {
+        const history = JSON.parse(localStorage.getItem("playHistory") || "[]");
+        return Array.isArray(history) && history.length > 0;
+    } catch (e) {
+        return false;
+    }
+}
 
+function showWaitButtonAfter30Seconds() {
+    if (typeof reviewMode !== "undefined" && reviewMode) return;
+    if (!hasCompletedRound()) return;
+    setTimeout(() => {
+        if (!boxOpening && !boxOpened && !waitingForBox) {
+            document.getElementById("waitButton").classList.remove("hidden");
+        }
+    }, 30000);
+}
+
+function waitWithoutOpening() {
+    if (typeof reviewMode !== "undefined" && reviewMode) return;
+    if (boxOpening || boxOpened || waitingForBox) return;
+    if (document.getElementById("waitButton").classList.contains("hidden")) return;
+
+    waitingForBox = true;
+    document.getElementById("boxButton").disabled = true;
+    document.getElementById("waitButton").classList.add("hidden");
+    document.getElementById("waitStory").textContent = "僕は開けずに待った…";
+
+    setTimeout(() => {
+        document.getElementById("waitStory").textContent =
+            "僕は開けずに待った…\n\n箱がガタガタと勝手に揺れ、開いてしまった！";
+        document.getElementById("box").classList.add("waitBoxShaking");
+
+        // 文字の表示と同時に1秒間揺れ、その後に既存の煙演出へ。
+        setTimeout(() => {
+            document.getElementById("box").classList.remove("waitBoxShaking");
+            openBox(true);
+        }, 1000);
+    }, 5000);
+}
+
+function openBox(fromWaiting = false) {
+    if (boxOpening || boxOpened) return;
+    if (waitingForBox && !fromWaiting) return;
     const button = document.getElementById("boxButton");
+    if (button.disabled && !fromWaiting) return;
 
-    if(button.disabled) return;
-
+    boxOpening = true;
     button.disabled = true;
-
+    document.getElementById("waitButton").classList.add("hidden");
+    createSmoke();
     createSmoke();
 
-    createSmoke();
-
-    setTimeout(()=>{
-
-        document
-            .getElementById("title")
-            .innerHTML =
-            "STEP1";
-
-        document
-            .getElementById("story")
-            .style.display = "none";
-
-        document
-            .getElementById("boxButton")
-            .style.display = "none";
-
-        document
-            .getElementById("after")
-            .classList.remove("hidden");
-
+    setTimeout(() => {
+        boxOpened = true;
+        document.getElementById("title").innerHTML = "STEP1";
+        document.getElementById("story").style.display = "none";
+        document.getElementById("boxButton").style.display = "none";
+        document.getElementById("waitButton").style.display = "none";
+        document.getElementById("after").classList.remove("hidden");
         startFog();
-
-    },2000);
+    }, 2000);
 }
 
-function createSmoke(){
-
-    const container =
-        document.getElementById("smoke-container");
-
-    for(let i=0;i<40;i++){
-
-        const smoke =
-            document.createElement("div");
-
+function createSmoke() {
+    const container = document.getElementById("smoke-container");
+    for (let i = 0; i < 40; i++) {
+        const smoke = document.createElement("div");
         smoke.className = "smoke";
-
-        smoke.style.left =
-            (window.innerWidth / 2 - 60)
-            + (Math.random() * 120 - 60)
-            + "px";
-
-        smoke.style.top =
-            (window.innerHeight / 2 - 60)
-            + (Math.random() * 120 - 60)
-            + "px";
-
-        smoke.style.setProperty(
-            "--dx",
-            (Math.random() * 600 - 300) + "px"
-        );
-
-        smoke.style.setProperty(
-            "--dy",
-            (Math.random() * 400 - 200) + "px"
-        );
-
+        smoke.style.left = (window.innerWidth / 2 - 60) + (Math.random() * 120 - 60) + "px";
+        smoke.style.top = (window.innerHeight / 2 - 60) + (Math.random() * 120 - 60) + "px";
+        smoke.style.setProperty("--dx", (Math.random() * 600 - 300) + "px");
+        smoke.style.setProperty("--dy", (Math.random() * 400 - 200) + "px");
         container.appendChild(smoke);
-
-        setTimeout(()=>{
-            smoke.remove();
-        },4000);
+        setTimeout(() => { smoke.remove(); }, 4000);
     }
 }
 
-function check(){
-
-    if(reviewMode) return;
-
-    const ans =
-        document
-        .getElementById("answer")
-        .value
-        .trim()
-        .toLowerCase();
-
-    // A
-    if(
-        ans === "竜宮城" ||
-        ans === "りゅうぐうじょう" ||
-        ans === "リュウグウジョウ"
-    ){
-
-        document
-            .getElementById("result")
-            .innerHTML =
-            "A正解";
-
+function check() {
+    if (reviewMode) return;
+    const ans = document.getElementById("answer").value.trim().toLowerCase();
+    if (ans === "竜宮城" || ans === "りゅうぐうじょう" || ans === "リュウグウジョウ") {
+        document.getElementById("result").innerHTML = "A正解";
         return;
     }
-
-    // B
-    if(
-        ans === "ウラシマ" ||
-        ans === "うらしま" ||
-        ans === "浦島"
-    ){
-
-        document
-            .getElementById("result")
-            .innerHTML =
-            "B正解";
-
+    if (ans === "ウラシマ" || ans === "うらしま" || ans === "浦島") {
+        document.getElementById("result").innerHTML = "B正解";
         return;
     }
-
-    // C
-    if(
-        ans === "ミドリ" ||
-        ans === "みどり" ||
-        ans === "緑"
-    ){
-
-        document
-            .getElementById("result")
-            .innerHTML =
-            "C正解";
-
+    if (ans === "ミドリ" || ans === "みどり" || ans === "緑") {
+        document.getElementById("result").innerHTML = "C正解";
         return;
     }
-
-    // D
-    if(
-        ans === "ひらがな"||
-        ans === "ヒラガナ"||
-        ans === "平仮名"
-    ){
-
-        document
-            .getElementById("result")
-            .innerHTML =
-            "D正解";
-
+    if (ans === "ひらがな" || ans === "ヒラガナ" || ans === "平仮名") {
+        document.getElementById("result").innerHTML = "D正解";
         return;
     }
-
-    // E1
-    if(
-        ans === "せいじつ"||
-        ans === "セイジツ"||
-        ans === "誠実"
-    ){
+    if (ans === "せいじつ" || ans === "セイジツ" || ans === "誠実") {
         saveStepRecord(1, ans);
-
         saveRoute(1, "A");
-
         nextPage = "step2a.html";
-
         unlockMemory(1);
-
         return;
     }
-
-    // E2
-    if(
-        ans === "くろう"||
-        ans === "クロウ"||
-        ans === "苦労"
-    ){        
+    if (ans === "くろう" || ans === "クロウ" || ans === "苦労") {
         saveStepRecord(1, ans);
-
         saveRoute(1, "B");
-
         createSmoke();
-
-        setTimeout(()=>{
-
+        setTimeout(() => {
             removeMemory(1);
-
-            location.href =
-            "step2b.html";
-
-        },2000);
-
+            location.href = "step2b.html";
+        }, 2000);
         return;
     }
-
-    document
-        .getElementById("result")
-        .innerHTML =
-        "不正解";
+    document.getElementById("result").innerHTML = "不正解";
 }
 
-
-
+showWaitButtonAfter30Seconds();
 </script>
-
 </body>
 </html>
