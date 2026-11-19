@@ -289,12 +289,13 @@ function startCrystalStory(route, answer, penColor) {
     screen.innerHTML = `
       <div class="crystalStoryCard">
         <h2>水晶の記憶</h2>
-        <p id="crystalStoryLine"></p>
-        <form id="crystalStoryForm" class="hidden">
-          <label for="crystalStoryInput">オトヒメに伝えよう</label>
-          <input id="crystalStoryInput" type="text" autocomplete="off" aria-label="オトヒメに伝えよう">
-          <button type="submit">伝える</button>
-          <p id="crystalStoryError" role="status"></p>
+        <form id="crystalStoryForm">
+          <p id="crystalStoryLine"></p>
+          <div id="crystalStoryAnswerArea" class="hidden">
+            <p class="crystalStoryPrompt">オトヒメに伝えよう</p>
+            <button type="submit">伝える</button>
+            <p id="crystalStoryError" role="status"></p>
+          </div>
         </form>
         <button id="crystalStoryNext" type="button">次へ</button>
       </div>`;
@@ -310,47 +311,66 @@ function startCrystalStory(route, answer, penColor) {
         box-sizing:border-box; background:rgba(255,255,255,.08); }
       #crystalStoryLine { font-size:19px; line-height:1.9; white-space:pre-wrap; }
       #crystalStoryForm { margin-top:20px; }
-      #crystalStoryForm label { display:block; margin-bottom:10px; font-weight:bold; }
-      #crystalStoryInput { width:min(100%,380px); max-width:100%; }
+      #crystalStoryLine .crystalInlineInput { width:6.5em; max-width:42vw; box-sizing:border-box;
+        font-size:inherit; text-align:center; padding:6px 5px; margin:0 3px;
+        vertical-align:baseline; }
+      #crystalStoryLine .crystalInlineInput[data-length="2"] { width:4.5em; }
+      #crystalStoryLine .crystalInlineInput[data-length="4"] { width:8em; }
+      .crystalStoryPrompt { font-weight:bold; margin:12px 0; }
       #crystalStoryError { color:#fff0a8; min-height:1.5em; }
       #crystalStoryNext { margin-top:18px; }
       @media(max-width:600px){#crystalStoryLine{font-size:16px;}}
     `;
     document.head.appendChild(css);
 
-    // inputで指定するのは、各「」の中の語句。
-    // 2つある場面は、両方の語句を順番に入力する（助詞や空白は許容）。
+    // 穴埋めの箇所は文章内に個別の入力欄を表示する。
     const scenes = [
       {text:"水晶が無いと思ったらウラシマの手に…"},
       {text:"日記帳を読んだのですね…知られてしまった以上仕方ありません"},
       {text:"私には謎が解けなくて、ウラシマに託したのです"},
       {text:"ですがこれで大丈夫です"},
       {text:"戻って箱を開けずにいてください"},
-      {text:"・「玉手箱」が「開いて」しまう", answers:["玉手箱開いて","玉手箱が開いて"]},
+      {parts:["", "が", "しまう"], answers:["玉手箱", "開いて"]},
       {text:"あの箱がそんな箱だったなんて…そんな…それならどうしたら良いのでしょう…"},
-      {text:"・「一緒」に「戻ろう」", answers:["一緒戻ろう","一緒に戻ろう"]},
+      {parts:["", "に", ""], answers:["一緒", "戻ろう"]},
       {text:"お恥ずかしいことに、水晶を持ち運んだときに手に怪我をしてしまって文字が書けないのです"},
       {text:"せっかく解決策が見つかったのに私のせいで…"},
-      {text:"・[日記帳]を「破る」", answers:["破る"]},
+      {parts:["", "を", ""], answers:["日記帳", "破る"]},
       {text:"日記帳をどう破れば良いのでしょうか？"},
-      {text:"・破る文字は「らいす」", answers:["らいす","ライス"]}
+      {parts:["破る文字は", ""], answers:["らいす"]}
     ];
     let position = 0;
     const line = screen.querySelector("#crystalStoryLine");
     const form = screen.querySelector("#crystalStoryForm");
-    const input = screen.querySelector("#crystalStoryInput");
+    const answerArea = screen.querySelector("#crystalStoryAnswerArea");
     const error = screen.querySelector("#crystalStoryError");
     const next = screen.querySelector("#crystalStoryNext");
-    function normalize(v) {return v.normalize("NFKC").replace(/[\s　、。・「」『』]/g,"").trim();}
+    function normalize(v) {return v.normalize("NFKC").replace(/[\s　]/g,"").trim();}
     function render() {
         const scene = scenes[position];
-        line.textContent = scene.text.replace(/^・/,"");
         const needsInput = Array.isArray(scene.answers);
-        form.classList.toggle("hidden", !needsInput);
+        line.replaceChildren();
+        if (needsInput) {
+            scene.parts.forEach((part, i) => {
+                line.appendChild(document.createTextNode(part));
+                if (i < scene.answers.length) {
+                    const field = document.createElement("input");
+                    field.type = "text";
+                    field.className = "crystalInlineInput";
+                    field.dataset.length = String(scene.answers[i].length);
+                    field.maxLength = scene.answers[i].length;
+                    field.autocomplete = "off";
+                    field.setAttribute("aria-label", `穴埋め${i+1}`);
+                    line.appendChild(field);
+                }
+            });
+        } else {
+            line.textContent = scene.text;
+        }
+        answerArea.classList.toggle("hidden", !needsInput);
         next.classList.toggle("hidden", needsInput);
-        input.value = "";
         error.textContent = "";
-        if(needsInput) input.focus();
+        if (needsInput) line.querySelector("input")?.focus();
     }
     function advance() {
         position++;
@@ -359,8 +379,11 @@ function startCrystalStory(route, answer, penColor) {
     }
     form.addEventListener("submit", e => {
         e.preventDefault();
-        const valid = scenes[position].answers.some(a => normalize(a) === normalize(input.value));
-        if(!valid) {error.textContent="伝える言葉が違うようだ。"; return;}
+        const scene = scenes[position];
+        if (!scene.answers) return;
+        const fields = [...line.querySelectorAll("input")];
+        const valid = scene.answers.every((a, i) => normalize(fields[i].value) === normalize(a));
+        if(!valid) {error.textContent="穴埋めの言葉が違うようだ。"; return;}
         advance();
     });
     next.addEventListener("click", advance);
