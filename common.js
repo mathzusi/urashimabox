@@ -416,25 +416,42 @@ function createSmoke(){
    ページ読み込み時
 ========================= */
 
-window.addEventListener("load",function(){
+window.addEventListener("load", function(){
 
-    const memoryPanel =
-        document.getElementById("memoryPanel");
+    const memoryPanel = document.getElementById("memoryPanel");
 
     if(memoryPanel){
 
-        for(let i=1;i<=3;i++){
+        let memoryState;
 
-            if(
-                localStorage.getItem("memory"+i)==="true"
-            ){
+        if(reviewMode){
 
-                createMemoryButton(i);
+            // 過去の記録に保存された記憶を使用
+            const step = Number(
+                new URLSearchParams(location.search).get("step")
+            );
 
+            const record = getReviewRecord()?.records?.[step];
+
+            memoryState = record?.memoryState || {};
+
+        }else{
+
+            // 現在のゲームの記憶を使用
+            memoryState = {};
+
+            for(let i = 1; i <= 3; i++){
+                memoryState[i] =
+                    localStorage.getItem("memory" + i) === "true";
             }
-
         }
 
+        for(let i = 1; i <= 3; i++){
+
+            if(memoryState[i] === true){
+                createMemoryButton(i);
+            }
+        }
     }
 
     startFog();
@@ -464,7 +481,7 @@ function saveRoute(step, route){
 }
 
 /* =========================
-   前回の記録ボタンを作成
+   前回の記憶ボタンを作成
 ========================= */
 
 function createRecordButton(){
@@ -510,7 +527,7 @@ function createRecordButton(){
 
     button.className = "memoryButton";
 
-    button.textContent = "前回の記録";
+    button.textContent = "前回の記憶";
 
 
     // 通常ページでも記録ページでも
@@ -556,7 +573,7 @@ async function startEnding(
     endingStarted = true;
 
 
-    // 前回の記録を開いている場合は閉じる
+    // 前回の記憶を開いている場合は閉じる
 
     if(recordSplitOpened){
 
@@ -905,13 +922,23 @@ function saveStepRecord(step, answer, extra = {}){
         localStorage.getItem("currentRecords") || "{}"
     );
 
+    // このSTEPを解答した時点での記憶を保存
+    const memoryState = {};
+
+    for(let i = 1; i <= 3; i++){
+        memoryState[i] =
+            localStorage.getItem("memory" + i) === "true";
+    }
+
     records[step] = {
 
         page: location.pathname.split("/").pop() || "index.html",
 
         answer: answer,
 
-        extra: extra
+        extra: extra,
+
+        memoryState: memoryState
 
     };
 
@@ -919,7 +946,6 @@ function saveStepRecord(step, answer, extra = {}){
         "currentRecords",
         JSON.stringify(records)
     );
-
 }
 
 /* =========================
@@ -988,7 +1014,7 @@ function savePreviousRecords(){
 
 }
 
-/* 前回の記録ボタンを作成 */
+/* 前回の記憶ボタンを作成 */
 
 function getRoute(step){
 
@@ -1199,7 +1225,7 @@ window.addEventListener("load", function(){
 
     const label = document.createElement("span");
 
-    label.textContent = "前回の記録を閲覧中";
+    label.textContent = "前回の記憶を閲覧中";
 
     reviewBar.appendChild(label);
 
@@ -1231,7 +1257,7 @@ window.addEventListener("load", function(){
 });
 
 /* =========================
-   前回の記録・分割表示
+   前回の記憶・分割表示
 ========================= */
 
 let recordSplitOpened = false;
@@ -1421,7 +1447,7 @@ function openRecordSplit(){
        表示する周回を決定
     ========================= */
 
-    // 通常ページなら前回の記録
+    // 通常ページなら前回の記憶
     // 記録ページならさらに1周前
 
     currentHistoryIndex = reviewMode
@@ -1594,7 +1620,7 @@ function openRecordSplit(){
 
     if(currentHistoryIndex === 0){
 
-        historyTitle = "前回の記録";
+        historyTitle = "前回の記憶";
 
     }else if(currentHistoryIndex === 1){
 
@@ -2251,7 +2277,12 @@ function handleBBBPastAnswer(data){
     }
     // 過去の記録は変更せず、今のゲームの記録として解答を採用する
     const records=JSON.parse(localStorage.getItem("currentRecords")||"{}");
-    records[step]={page:record.page,answer:record.answer,extra:record.extra||{}};
+    records[step] = {
+    page: record.page,
+    answer: record.answer,
+    extra: record.extra || {},
+    memoryState: record.memoryState || {}
+    };
     for(let i=step+1;i<=4;i++)delete records[i];
     localStorage.setItem("currentRecords",JSON.stringify(records));
     saveRoute(step,route);
