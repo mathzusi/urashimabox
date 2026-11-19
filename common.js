@@ -1,16 +1,16 @@
 
-// 記録閲覧モードかどうか
+// 記憶閲覧モードかどうか
 const reviewMode =
     new URLSearchParams(location.search).get("review") === "true";
 
-// 記録を復元しているかどうか
+// 記憶を復元しているかどうか
 let restoringRecord = false;
 
 /* =========================
    過去の周回の管理
 ========================= */
 
-// 閲覧している記録の番号
+// 閲覧している記憶の番号
 // 0：前回
 // 1：前々回
 // 2：3周前
@@ -23,7 +23,7 @@ const reviewHistoryIndex = Number(
 );
 
 
-// 過去のプレイ記録を取得する
+// 過去のプレイ記憶を取得する
 
 function getPlayHistory(){
 
@@ -66,7 +66,7 @@ function getPlayHistory(){
 }
 
 
-// 指定された周回の記録を取得する
+// 指定された周回の記憶を取得する
 
 function getHistoryRecord(index){
 
@@ -77,7 +77,7 @@ function getHistoryRecord(index){
 }
 
 
-// 現在閲覧している周回の記録を取得する
+// 現在閲覧している周回の記憶を取得する
 
 function getReviewRecord(){
 
@@ -426,7 +426,7 @@ window.addEventListener("load", function(){
 
         if(reviewMode){
 
-            // 過去の記録に保存された記憶を使用
+            // 過去の記憶に保存された記憶を使用
             const step = Number(
                 new URLSearchParams(location.search).get("step")
             );
@@ -493,7 +493,7 @@ function createRecordButton(){
     const history = getPlayHistory();
 
 
-    // このページから見て1周前の記録
+    // このページから見て1周前の記憶
 
     const olderIndex = reviewMode
 
@@ -502,7 +502,7 @@ function createRecordButton(){
         : 0;
 
 
-    // それより古い記録が存在しない場合は
+    // それより古い記憶が存在しない場合は
     // ボタンを表示しない
 
     if(!history[olderIndex]) return;
@@ -530,7 +530,7 @@ function createRecordButton(){
     button.textContent = "前回の記憶";
 
 
-    // 通常ページでも記録ページでも
+    // 通常ページでも記憶ページでも
     // そのページ内で分割画面を開く
 
     button.onclick = openRecordSplit;
@@ -540,7 +540,7 @@ function createRecordButton(){
 
 }
 
-// 現在開いているページから分岐履歴を記録する
+// 現在開いているページから分岐履歴を記憶する
 const currentPage = location.pathname.split("/").pop();
 
 const pageRoutes = {
@@ -829,7 +829,7 @@ async function startEnding(
 
 
     /* =========================
-       周回時の記憶・記録の処理
+       周回時の記憶・記憶の処理
     ========================= */
 
     if(penColor === "blue"){
@@ -845,22 +845,22 @@ async function startEnding(
     }
 
 
-    // 過去のすべてのプレイ記録を削除
+    // 過去のすべてのプレイ記憶を削除
 
     localStorage.removeItem("playHistory");
 
 
-    // 以前の保存形式の記録も削除
+    // 以前の保存形式の記憶も削除
 
     localStorage.removeItem("previousRecords");
 
 
-    // 今回のプレイ記録も削除
+    // 今回のプレイ記憶も削除
 
     localStorage.removeItem("currentRecords");
 
 
-    // 記録閲覧用の情報を削除
+    // 記憶閲覧用の情報を削除
 
     sessionStorage.removeItem("reviewReturnPage");
 
@@ -869,7 +869,7 @@ async function startEnding(
 
 
     // 赤いペンの場合
-    // 今回の記録を追加保存する
+    // 今回の記憶を追加保存する
 
     savePreviousRecords();
 
@@ -909,7 +909,7 @@ function wait(ms){
 }
 
 /* =========================
-   前回のプレイ記録
+   前回のプレイ記憶
 ========================= */
 
 
@@ -949,12 +949,12 @@ function saveStepRecord(step, answer, extra = {}){
 }
 
 /* =========================
-   1周分の記録を保存する
+   1周分の記憶を保存する
 ========================= */
 
 function savePreviousRecords(){
 
-    // 今回のプレイ記録
+    // 今回のプレイ記憶
 
     const records = JSON.parse(
 
@@ -976,12 +976,12 @@ function savePreviousRecords(){
     };
 
 
-    // 過去のプレイ記録を取得
+    // 過去のプレイ記憶を取得
 
     const history = getPlayHistory();
 
 
-    // 今回の記録を一番前に追加
+    // 今回の記憶を一番前に追加
 
     history.unshift({
 
@@ -992,7 +992,7 @@ function savePreviousRecords(){
     });
 
 
-    // すべての周回の記録を保存
+    // すべての周回の記憶を保存
 
     localStorage.setItem(
 
@@ -1008,7 +1008,7 @@ function savePreviousRecords(){
     localStorage.removeItem("previousRecords");
 
 
-    // 今回のプレイ記録をリセット
+    // 今回のプレイ記憶をリセット
 
     localStorage.removeItem("currentRecords");
 
@@ -1018,7 +1018,7 @@ function savePreviousRecords(){
 
 function getRoute(step){
 
-    // 過去の記録を閲覧している場合
+    // 過去の記憶を閲覧している場合
 
     if(reviewMode){
 
@@ -1044,7 +1044,7 @@ window.addEventListener("load", function(){
 });
 
 /* =========================
-   記録閲覧モード
+   記憶閲覧モード
 ========================= */
 
 window.addEventListener("load", function(){
@@ -1059,7 +1059,7 @@ window.addEventListener("load", function(){
     const step = Number(params.get("step"));
 
 
-    // 閲覧している周回の記録を取得
+    // 閲覧している周回の記憶を取得
 
     const previous = getReviewRecord();
 
@@ -1068,7 +1068,7 @@ window.addEventListener("load", function(){
     if(!record) return;
 
 
-    // STEP1の記録は、箱を開けた後の画面で表示する
+    // STEP1の記憶は、箱を開けた後の画面で表示する
     if(step === 1 && typeof openBox === "function"){
         const before = document.getElementById("story");
         const box = document.getElementById("boxButton");
@@ -1101,7 +1101,7 @@ window.addEventListener("load", function(){
 
     if(step === 3 && record.extra?.rooms){
 
-        // 記録の復元中だけ部屋の選択を許可
+        // 記憶の復元中だけ部屋の選択を許可
 
         restoringRecord = true;
 
@@ -1215,7 +1215,7 @@ window.addEventListener("load", function(){
 
 
     /* =========================
-       単独で記録を閲覧している場合
+       単独で記憶を閲覧している場合
     ========================= */
 
     const reviewBar = document.createElement("div");
@@ -1295,7 +1295,7 @@ function isRecordMobile(){
     const direction = params.get("direction");
 
 
-    // 記録ページの場合は
+    // 記憶ページの場合は
     // 親ページから渡された分割方向を使用
 
     if(direction === "mobile"){
@@ -1448,7 +1448,7 @@ function openRecordSplit(){
     ========================= */
 
     // 通常ページなら前回の記憶
-    // 記録ページならさらに1周前
+    // 記憶ページならさらに1周前
 
     currentHistoryIndex = reviewMode
 
@@ -1464,7 +1464,7 @@ function openRecordSplit(){
     );
 
 
-    // 記録が存在しない場合
+    // 記憶が存在しない場合
 
     if(!previous?.records) return;
 
@@ -1605,7 +1605,7 @@ function openRecordSplit(){
 
 
     /* =========================
-       過去の記録側
+       過去の記憶側
     ========================= */
 
     const recordPane = document.createElement("div");
@@ -1624,18 +1624,18 @@ function openRecordSplit(){
 
     }else if(currentHistoryIndex === 1){
 
-        historyTitle = "前々回の記録";
+        historyTitle = "前々回の記憶";
 
     }else{
 
         historyTitle =
 
-            (currentHistoryIndex + 1) + "周前の記録";
+            (currentHistoryIndex + 1) + "周前の記憶";
 
     }
 
 
-    // 記録側の画面を作成
+    // 記憶側の画面を作成
 
     recordPane.innerHTML = `
 
@@ -1786,11 +1786,11 @@ function openRecordSplit(){
 
 
 /* =========================
-   指定したSTEPの記録を表示
+   指定したSTEPの記憶を表示
 ========================= */
 
 /* =========================
-   指定したSTEPの記録を表示
+   指定したSTEPの記憶を表示
 ========================= */
 
 function showRecordStep(step){
@@ -1832,12 +1832,12 @@ function showRecordStep(step){
         : "desktop";
 
 
-    // 過去の記録のページ名を取得
+    // 過去の記憶のページ名を取得
 
     let page = record.page;
 
 
-    // STEP4a・STEP4bの古い記録は
+    // STEP4a・STEP4bの古い記憶は
     // 統合後のstep4.htmlで表示する
 
     if(
@@ -2151,12 +2151,12 @@ function showBBBSpecialStory(){
     if(!isBBBSpecialMode()) return;
     const page=location.pathname.split("/").pop();
     const stories={
-        "index.html":"あの記録に残っていた答えを口にした瞬間、周囲の景色が歪んだ。\n気づくと、再び竜宮城で暗号に向き合っていた。\nこれは過去の続きなのか、それとも今の僕の選択なのか……。",
-        "step2a.html":"過去の記録に触れた直後、景色が切り替わった。\n記憶の中で選ばれた答えが、今の僕をこの場所へ連れてきたらしい。",
-        "step2b.html":"白い煙が視界を覆った。\n過去の記録の答えが、今の世界にまで影響している。\n薄れていく記憶を確かめながら、次の暗号に向かう。",
-        "step3a.html":"過去の記録からつながった道を、今の僕が歩いている。\nこの先の答えも、僕自身が選ばなければならない。",
-        "step3b.html":"また煙が立ち込め、思い出が遠のく。\nそれでも、過去の記録から始まったこの道を進むしかない。",
-        "step4.html":"過去の記録から続いた旅は、再び最後の暗号へたどり着いた。\n今度こそ、この答えで何が変わるのだろう。"
+        "index.html":"あの記憶に残っていた答えを口にした瞬間、周囲の景色が歪んだ。\n気づくと、再び竜宮城で暗号に向き合っていた。\nこれは過去の続きなのか、それとも今の僕の選択なのか……。",
+        "step2a.html":"過去の記憶に触れた直後、景色が切り替わった。\n記憶の中で選ばれた答えが、今の僕をこの場所へ連れてきたらしい。",
+        "step2b.html":"白い煙が視界を覆った。\n過去の記憶の答えが、今の世界にまで影響している。\n薄れていく記憶を確かめながら、次の暗号に向かう。",
+        "step3a.html":"過去の記憶からつながった道を、今の僕が歩いている。\nこの先の答えも、僕自身が選ばなければならない。",
+        "step3b.html":"また煙が立ち込め、思い出が遠のく。\nそれでも、過去の記憶から始まったこの道を進むしかない。",
+        "step4.html":"過去の記憶から続いた旅は、再び最後の暗号へたどり着いた。\n今度こそ、この答えで何が変わるのだろう。"
     };
     const text=stories[page];
     if(!text)return;
@@ -2189,7 +2189,7 @@ window.addEventListener("load",function(){
             event.stopImmediatePropagation();
             if(!canOperatePastRecord() || isPastButtonUsed(reviewHistoryIndex,step,kind))return;
             // topの確認が済んだ場合のみ使用済みにする
-            // 同一サイト内の記録iframeから現在のゲームへ直接伝える。
+            // 同一サイト内の記憶iframeから現在のゲームへ直接伝える。
             // postMessageだけに依存すると、環境によって受信できず移動しない場合がある。
             try{
                 if(typeof window.top.handleBBBPastAnswer === "function"){
@@ -2204,7 +2204,7 @@ window.addEventListener("load",function(){
     });
 });
 
-// BBB解放後、すでに表示中の入れ子の記録も操作可能にする
+// BBB解放後、すでに表示中の入れ子の記憶も操作可能にする
 function refreshBBBPastAnswerButtons(){
     if(!reviewMode)return;
     const step=Number(new URLSearchParams(location.search).get("step"));
@@ -2221,7 +2221,7 @@ function refreshBBBRecordTree(win=window){
         win.document.querySelectorAll("iframe").forEach(frame=>{
             if(frame.contentWindow)refreshBBBRecordTree(frame.contentWindow);
         });
-    }catch(error){console.warn("記録ボタンの更新をスキップ",error);}
+    }catch(error){console.warn("記憶ボタンの更新をスキップ",error);}
 }
 // 最上位の現在のゲームだけが履歴を検証し、実際のルート処理を行う
 function handleBBBPastAnswer(data){
@@ -2242,7 +2242,7 @@ function handleBBBPastAnswer(data){
     if(step===4){
         const historicalRoute=[1,2,3].map(i=>history?.routes?.[i]).join("");
         if(!/^[AB]{3}$/.test(historicalRoute) || typeof record.answer!=="string" || !record.answer.trim()){
-            alert("この周回のSTEP4の記録が不完全なため、解答を使用できません。");
+            alert("この周回のSTEP4の記憶が不完全なため、解答を使用できません。");
             return;
         }
     }
@@ -2259,14 +2259,14 @@ function handleBBBPastAnswer(data){
         // saveRouteは後続ルートを消すので、必ずSTEP1から順に設定する。
         for(let i=1;i<=3;i++)saveRoute(i,history.routes[i]);
 
-        // STEP1～3の記録も同じ周回に合わせ、現在の周回の記録と混在させない。
+        // STEP1～3の記憶も同じ周回に合わせ、現在の周回の記憶と混在させない。
         const priorRecords={};
         for(let i=1;i<=3;i++){
             if(history.records?.[i])priorRecords[i]={...history.records[i]};
         }
         localStorage.setItem("currentRecords",JSON.stringify(priorRecords));
 
-        // 過去の記録の解答とペンの色をSTEP4へ引き継ぐ。
+        // 過去の記憶の解答とペンの色をSTEP4へ引き継ぐ。
         sessionStorage.setItem("bbbPendingStep4Answer",JSON.stringify({
             answer:record.answer,
             penColor:kind,
@@ -2275,7 +2275,7 @@ function handleBBBPastAnswer(data){
         location.href="step4.html";
         return;
     }
-    // 過去の記録は変更せず、今のゲームの記録として解答を採用する
+    // 過去の記憶は変更せず、今のゲームの記憶として解答を採用する
     const records=JSON.parse(localStorage.getItem("currentRecords")||"{}");
     records[step] = {
     page: record.page,
@@ -2318,7 +2318,7 @@ window.addEventListener("message",function(event){
 });
 
 /* =====================================================
-   記録タブの保持と「水晶」
+   記憶タブの保持と「水晶」
 ===================================================== */
 function getRecordChainNode(){
     return {opened:recordSplitOpened,historyIndex:currentHistoryIndex,step:currentRecordStep,review:reviewMode,reviewHistoryIndex};
@@ -2357,7 +2357,7 @@ function restoreRecordChainAt(win,chain,depth){
     const frame=win.document.getElementById("recordFrame");
     if(frame && depth+1<chain.length){
         frame.addEventListener("load",function(){
-            try{restoreRecordChainAt(frame.contentWindow,chain,depth+1);}catch(e){console.warn("記録の復元に失敗しました",e);}
+            try{restoreRecordChainAt(frame.contentWindow,chain,depth+1);}catch(e){console.warn("記憶の復元に失敗しました",e);}
         },{once:true});
     }
 }
@@ -2367,7 +2367,7 @@ window.addEventListener("load",function(){
     if(!raw)return;
     sessionStorage.removeItem("bbbRestoreRecordChain");
     if(sessionStorage.getItem("bbbRecordUnlocked")!=="true")return;
-    try{restoreRecordChainAt(window,JSON.parse(raw),0);}catch(e){console.warn("記録タブの復元に失敗しました",e);}
+    try{restoreRecordChainAt(window,JSON.parse(raw),0);}catch(e){console.warn("記憶タブの復元に失敗しました",e);}
 });
 
 function registerCrystalStep3aUse(historyIndex){

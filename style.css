@@ -867,7 +867,7 @@ img[src="tamatebako.png"] {
 
 }
 
-/* 前回の記録一覧 */
+/* 前回の記憶一覧 */
 
 #recordButtons {
 
@@ -882,7 +882,7 @@ img[src="tamatebako.png"] {
 }
 
 
-/* 記録閲覧中の表示 */
+/* 記憶閲覧中の表示 */
 
 #reviewBar {
 
@@ -933,7 +933,7 @@ img[src="tamatebako.png"] {
 }
 
 /* =========================
-   前回の記録・分割表示
+   前回の記憶・分割表示
 ========================= */
 
 
@@ -1168,7 +1168,7 @@ body.recordSplitActive {
 
 
 /* =========================
-   前回の記録側
+   前回の記憶側
 ========================= */
 
 #recordPane {
@@ -1190,7 +1190,7 @@ body.recordSplitActive {
 }
 
 
-/* 記録側のヘッダー */
+/* 記憶側のヘッダー */
 
 #recordPaneHeader {
 
@@ -1316,7 +1316,7 @@ body.recordSplitActive {
 
 
 /* =========================
-   iframe内の記録ページ
+   iframe内の記憶ページ
 ========================= */
 
 body.embeddedRecord {
@@ -1366,7 +1366,7 @@ body.embeddedRecord {
     }
 
 
-    /* 記録側のヘッダーを小さくする */
+    /* 記憶側のヘッダーを小さくする */
 
     #recordPaneHeader {
 
@@ -1430,7 +1430,7 @@ body.embeddedRecord {
 }
 
 
-/* 記録側も狭い画面では同じサイズにする */
+/* 記憶側も狭い画面では同じサイズにする */
 
 @media screen and (max-width: 760px) {
 
@@ -1444,7 +1444,7 @@ body.embeddedRecord {
 
 }
 
-/* 前回の記録側の記憶ボタン */
+/* 前回の記憶側の記憶ボタン */
 
 body.embeddedRecord #memoryPanel {
 
@@ -1459,7 +1459,7 @@ body.embeddedRecord #memoryPanel {
 }
 
 
-/* 前回の記録側の記憶ボタンのサイズ */
+/* 前回の記憶側の記憶ボタンのサイズ */
 
 body.embeddedRecord .memoryButton {
 
@@ -1698,7 +1698,7 @@ body.embeddedRecord .memoryButton {
 
 
 /* =========================
-   記録側のヘッダー
+   記憶側のヘッダー
 ========================= */
 
 #recordPaneHeader {
@@ -1830,7 +1830,7 @@ body.embeddedRecord #memoryPanel {
 }
 
 
-/* 記録側の記憶ボタン */
+/* 記憶側の記憶ボタン */
 
 body.embeddedRecord .memoryButton {
 

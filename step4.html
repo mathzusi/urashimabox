@@ -443,7 +443,7 @@ function isAcceptedAnswer(input, answer) {
 }
 
 function finishCrystalStory(route, penColor) {
-    // 通常のエンディングと同様に周回記録を確定する。
+    // 通常のエンディングと同様に周回記憶を確定する。
     if(penColor === "blue") {
         for(let i=1;i<=3;i++)localStorage.removeItem("memory"+i);
         localStorage.removeItem("playHistory");
@@ -530,7 +530,7 @@ function startBBBEvent() {
     // 特殊演出の解放状態を保存
     sessionStorage.setItem("bbbRecordUnlocked", "true");
 
-    // 記録画面を更新
+    // 記憶画面を更新
     refreshBBBRecordTree();
 
     // 記憶解禁と同じ形式のポップアップを表示
@@ -554,7 +554,7 @@ function applyPastStep4Answer(){
     if(currentRoute!==pending.route ||
        !["red","blue"].includes(pending.penColor) ||
        !puzzleAnswers[currentRoute]?.includes(pending.answer)){
-        alert("過去のSTEP4の解答を適用できませんでした。記録を確認してください。");
+        alert("過去のSTEP4の解答を適用できませんでした。記憶を確認してください。");
         return;
     }
     document.getElementById("answer").value=pending.answer;
