@@ -552,9 +552,6 @@
     解答
 </button>
 
-<button type="button" id="resetRoomButton" onclick="resetRooms()" style="margin-left: 8px;">
-    選択をリセット
-</button>
 
 <script>
 
@@ -744,43 +741,6 @@ function checkRoomOrder(){
         // 不正解でも選択状態は維持し、そのまま修正できる。
 
     }
-
-}
-
-function resetRooms(){
-
-    if(reviewMode || answered) return;
-
-    selectedRooms = [];
-
-    checkingRooms = false;
-
-
-    // マップ上の丸数字をすべて削除
-
-    document
-        .querySelectorAll(".selectionNumber")
-        .forEach(number => number.remove());
-
-
-    // 選択した部屋のラジオボタンを解除
-
-    document
-        .querySelectorAll('input[name="giftRoom"]')
-        .forEach(input => {
-            input.checked = false;
-        });
-
-
-    // 判定結果を消す
-
-    document
-        .getElementById("selectedSymbols")
-        .innerHTML = "";
-
-    document
-        .getElementById("mapResult")
-        .textContent = "";
 
 }
 
