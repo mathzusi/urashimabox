@@ -627,6 +627,28 @@ let checkingRooms = false;
 
 let answered = false;
 
+function resetRooms(){
+
+    selectedRooms = [];
+
+    checkingRooms = false;
+
+    // マップ上の丸数字をすべて削除
+    document.querySelectorAll(".selectionNumber")
+        .forEach(number => number.remove());
+
+    // 玉手箱を貰った部屋の選択を解除
+    document.querySelectorAll('input[name="giftRoom"]')
+        .forEach(input => {
+            input.checked = false;
+        });
+
+    // 選択した記号と判定結果を消す
+    document.getElementById("selectedSymbols").innerHTML = "";
+    document.getElementById("mapResult").textContent = "";
+
+}
+
 
 function selectRoom(roomNumber){
 
@@ -756,16 +778,18 @@ function checkRoomOrder(){
     }
 
 
-    // どちらでもない場合
-    else{
+// どちらでもない場合
+else {
 
-        document.getElementById("mapResult").textContent =
-            "不正解";
+    document.getElementById("mapResult").textContent =
+        "不正解";
 
-        // 不正解でも選択状態は維持し、そのまま修正できる。
+    // 1秒後に選択状態をリセット
+    setTimeout(() => {
+        resetRooms();
+    }, 1000);
 
-    }
-
+}
 }
 
 const route1 = getRoute(1);
