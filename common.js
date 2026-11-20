@@ -1336,91 +1336,52 @@ function isRecordMobile(){
 ========================= */
 
 function updateRecordSplitDirection(){
-
-    const layout = document.getElementById(
-
-        "recordSplitLayout"
-
-    );
-
-
-    const divider = document.getElementById(
-
-        "recordSplitDivider"
-
-    );
-
-
+    const layout = document.getElementById("recordSplitLayout");
+    const divider = document.getElementById("recordSplitDivider");
     if(!layout || !divider) return;
 
-
-    // 分割方向を取得
-
-    const isMobile = isRecordMobile();
-
-
-    // 境界線の持ち手
-
+    const mobile = isRecordMobile();
     const handle = divider.querySelector("span");
+    const currentPane = layout.querySelector(":scope > #currentPane");
+    const recordPane = layout.querySelector(":scope > #recordPane");
 
-
-    if(isMobile){
-
-
-        // スマートフォン：上下分割
-
-        layout.style.gridTemplateColumns =
-
-            "minmax(0, 1fr)";
-
-
-        layout.style.gridTemplateRows =
-
-            "minmax(0, var(--split-size, 50%)) 8px minmax(0, 1fr)";
-
-
-        divider.style.cursor = "row-resize";
-
-
-        if(handle){
-
-            handle.style.width = "50px";
-
-            handle.style.height = "4px";
-
+    if(mobile){
+        // スマートフォン：現在の画面を隠し、過去の記憶に表示領域を譲る。
+        // 入れ子の分割を繰り返しても表示領域が半分ずつ縮まない。
+        layout.style.gridTemplateColumns = "minmax(0, 1fr)";
+        layout.style.gridTemplateRows = "0px 0px minmax(0, 1fr)";
+        if(currentPane){
+            currentPane.style.visibility = "hidden";
+            currentPane.style.overflow = "hidden";
         }
-
-
+        if(recordPane){
+            recordPane.style.minHeight = "0";
+            recordPane.style.overflow = "hidden";
+        }
+        divider.style.visibility = "hidden";
+        divider.style.pointerEvents = "none";
     }else{
-
-
-        // PC：左右分割
-
+        // PC：これまでどおり左右分割・境界線のドラッグを維持する。
         layout.style.gridTemplateColumns =
-
             "minmax(0, var(--split-size, 50%)) 8px minmax(0, 1fr)";
-
-
-        layout.style.gridTemplateRows =
-
-            "minmax(0, 1fr)";
-
-
-        divider.style.cursor = "col-resize";
-
-
-        if(handle){
-
-            handle.style.width = "4px";
-
-            handle.style.height = "50px";
-
+        layout.style.gridTemplateRows = "minmax(0, 1fr)";
+        if(currentPane){
+            currentPane.style.visibility = "";
+            currentPane.style.overflow = "";
         }
-
+        if(recordPane){
+            recordPane.style.minHeight = "";
+            recordPane.style.overflow = "";
+        }
+        divider.style.visibility = "";
+        divider.style.pointerEvents = "";
+        divider.style.cursor = "col-resize";
+        if(handle){
+            handle.style.width = "4px";
+            handle.style.height = "50px";
+        }
     }
-
 }
-
 
 // 画面サイズが変わった場合にも対応
 

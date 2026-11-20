@@ -2033,3 +2033,56 @@ img {
 #memoryViewer #viewerImage.hidden {
     display: none;
 }
+
+/* =========================
+   スマホ：多重記憶を全画面で開く
+   （PC版の分割表示には影響しない）
+========================= */
+@media screen and (max-width: 760px) {
+    #recordSplitLayout,
+    #recordSplitLayout.recordSplitMobile {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 0px 0px minmax(0, 1fr);
+    }
+
+    #recordSplitLayout > #currentPane {
+        visibility: hidden;
+        overflow: hidden;
+    }
+
+    #recordSplitLayout > #recordSplitDivider {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    #recordSplitLayout > #recordPane {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    #recordPaneHeader {
+        flex-shrink: 0;
+        padding: 5px 8px;
+    }
+
+    #recordPaneTitle {
+        margin-bottom: 4px;
+    }
+
+    #recordStepButtons {
+        margin-top: 4px;
+        gap: 4px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    #recordStepButtons button {
+        padding: 5px 3px;
+        font-size: 11px;
+    }
+
+    #recordFrame {
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+    }
+}
