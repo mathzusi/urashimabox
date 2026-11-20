@@ -1983,12 +1983,12 @@ body.bbbDizzy {
 /* スマホ版 */
 @media screen and (max-width: 600px) {
     .promiseBox {
-        width: 90%;
+        width: 97%;
         margin: 20px auto 25px;
     }
 
     .promiseBox .promiseText {
-        font-size: 12.5px;
+        font-size: 13.5px;
         width: 85%;
     }
 }
@@ -2008,4 +2008,11 @@ body.bbbDizzy {
         margin-bottom: 35px;
     }
 
+}
+
+/* サイト内の画像のドラッグを防止 */
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
 }

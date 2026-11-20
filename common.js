@@ -2517,3 +2517,10 @@ function showGameNotice(message) {
 
     document.body.appendChild(popup);
 }
+
+/* 全画像のドラッグを無効化 */
+document.addEventListener("dragstart", function(event) {
+    if (event.target.closest("img")) {
+        event.preventDefault();
+    }
+});
