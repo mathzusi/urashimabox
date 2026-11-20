@@ -2016,3 +2016,20 @@ img {
     user-select: none;
     -webkit-user-select: none;
 }
+
+/* 記憶ポップアップの閉じるボタンを中央に配置 */
+#memoryViewer .modalContent > button {
+    display: block;
+    margin: 25px auto 0;
+}
+
+/* 記憶ポップアップ内の画像を中央に配置 */
+#memoryViewer #viewerImage {
+    display: block;
+    margin: 20px auto 0;
+}
+
+/* hiddenクラスが付いている間は非表示 */
+#memoryViewer #viewerImage.hidden {
+    display: none;
+}
