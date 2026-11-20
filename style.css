@@ -1947,3 +1947,65 @@ body.bbbDizzy {
     }
 }
 
+/* オトヒメとの約束 */
+.promiseBox {
+    position: relative;
+    width: 85%;
+    max-width: 600px;
+    margin: 30px auto 35px;
+}
+
+/* 吹き出し画像 */
+.promiseImage {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* 約束の文章 */
+.promiseBox .promiseText {
+    position: absolute;
+
+    /* 画像の吹き出し内部に配置 */
+    top: 50%;
+    left: 50%;
+    width: 85%;
+
+    transform: translate(-50%, -50%);
+
+    color: white !important;
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* スマホ版 */
+@media screen and (max-width: 600px) {
+    .promiseBox {
+        width: 90%;
+        margin: 20px auto 25px;
+    }
+
+    .promiseBox .promiseText {
+        font-size: 12.5px;
+        width: 85%;
+    }
+}
+
+/* STEP1 スマホ版の余白調整 */
+@media screen and (max-width: 600px) {
+
+    /* ストーリーと「まずは〜」の間 */
+    #after .stepInstruction {
+        margin-top: 60px;
+        margin-bottom: 0;
+    }
+
+    /* 「まずは〜」と吹き出しの間 */
+    #after .promiseBox {
+        margin-top: 5px;
+        margin-bottom: 35px;
+    }
+
+}

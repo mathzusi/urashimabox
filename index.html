@@ -74,16 +74,17 @@
         <img src="ikariotohime.png" id="otohime" alt="怒り乙姫">
         <p>なんだかよくわからないが、今の僕にはその暗号を解くしか選択肢はないようだ...。</p>
     </div>
-    <h2>まずはA〜Dを解き、Eの答えを導こう。</h2><br>
-    <h2>オトヒメとの約束：<br>「ピースの白い面は使わないこと」</h2>
+    <h2 class="stepInstruction">まずはA〜Dを解き、Eの答えを導こう。</h2>
+    <div class="promiseBox">
+    <img src="hukidasi.png" alt="オトヒメとの約束" class="promiseImage">
+    <div class="promiseText">
+        ピースの白い面は使わないこと
+    </div>
+    </div>
     <input id="answer">
     <button class="answerButton" onclick="check()">解答</button>
     <p id="result"></p>
 </div>
-
-<button onclick="localStorage.clear();location.reload();">
-記憶リセット
-</button>
 
 <script>
 let boxOpening = false;
