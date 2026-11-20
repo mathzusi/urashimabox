@@ -173,11 +173,11 @@
 
     left:4.4%;
 
-    top:2.7%;
+    top:3.1%;
 
     width:20%;
 
-    height:94%;
+    height:93.4%;
 
 }
 
@@ -203,11 +203,11 @@
 
     left:26.4%;
 
-    top:35%;
+    top:35.38%;
 
     width:19.8%;
 
-    height:36.8%;
+    height:36%;
 
 }
 
@@ -216,11 +216,11 @@
 
 .room4{
 
-    left:69.9%;
+    left:70.2%;
 
     top:3.1%;
 
-    width:20.4%;
+    width:19.8%;
 
     height:29%;
 
@@ -231,11 +231,11 @@
 
 .room5{
 
-    left:69.9%;
+    left:70.2%;
 
     top:35.2%;
 
-    width:20.4%;
+    width:19.8%;
 
     height:29%;
 
@@ -246,11 +246,11 @@
 
 .room6{
 
-    left:69.9%;
+    left:70.2%;
 
     top:67.5%;
 
-    width:20.4%;
+    width:19.8%;
 
     height:29%;
 
@@ -336,6 +336,28 @@
         height: 26px;
         font-size: 15px;
     }
+}
+
+/* スマホ版：生き物の画像サイズ調整 */
+@media screen and (max-width: 600px) {
+
+    .creatureRow {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .creatureRow img {
+        width: 22%;
+        max-width: 75px;
+        height: auto;
+        min-width: 0;
+        object-fit: contain;
+    }
+
 }
 
 </style>

@@ -188,11 +188,11 @@
 
     left:5.82%;
 
-    top:35.3%;
+    top:35.38%;
 
     width:25.3%;
 
-    height:36.8%;
+    height:36%;
 
 }
 
@@ -321,6 +321,28 @@
         height: 26px;
         font-size: 15px;
     }
+}
+
+/* スマホ版：生き物の画像サイズ調整 */
+@media screen and (max-width: 600px) {
+
+    .creatureRow {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .creatureRow img {
+        width: 22%;
+        max-width: 75px;
+        height: auto;
+        min-width: 0;
+        object-fit: contain;
+    }
+
 }
 
 </style>
